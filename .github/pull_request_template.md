@@ -12,7 +12,7 @@
 - 브랜치 관리 실수로 작업물이 main에 반영되어, mission-1 브랜치로 이동 재정비
 - PR 과정 중 entirely different commit histories 오류 경험
   → 처음부터 동일한 프로젝트 기반에서 작업하는 것이 중요함을 느낌
-- Swiper 적용 중 movieListData.map is not a function 오류 발생 → json 데이터 불러오는 방식에서 잘못된 import로 오류 발생 → 추후 더 공부해서 적용시킬 예정
+- Swiper 적용 중 movieListData.map is not a function 오류 발생 → json 데이터 불러오는 방식에서 잘못된 import로 오류 발생 → ~~추후 더 공부해서 적용시킬 예정~~ → Swiper 슬라이더 구현 완료
 
 ## 구현 이미지
 
