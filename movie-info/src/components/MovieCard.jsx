@@ -6,7 +6,7 @@ export default function MovieCard({ poster_path, title, vote_average, id }) {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/movie/${id}`);
+    navigate(`/details/${id}`);
   };
 
   return (

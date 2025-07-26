@@ -20,7 +20,7 @@ export default function MovieSlider({ movies }) {
         <SwiperSlide key={movie.id}>
           <div
             className="slider-card"
-            onClick={() => navigate(`/movie/${movie.id}`)}
+            onClick={() => navigate(`/details/${movie.id}`)}
           >
             <img
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
