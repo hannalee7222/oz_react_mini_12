@@ -1,0 +1,42 @@
+.swiper-pagination-bullet {
+  background-color: #999;
+  opacity: 0.6;
+  transition: all 0.3s;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #000;
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+.swiper {
+  padding-bottom: 25px;
+}
+
+.slider-card {
+  text-align: center;
+  cursor: pointer;
+}
+
+.slider-poster {
+  width: 100%;
+  aspect-ratio: 2/3;
+  object-fit: cover;
+  border-radius: 8px;
+  transition: transform 0.2s ease;
+}
+
+.slider-poster:hover {
+  transform: scale(1.05);
+}
+
+.slider-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.movie-slider-container {
+  margin-bottom: 48px;
+}
