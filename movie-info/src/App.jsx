@@ -5,19 +5,13 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import MovieCard from './components/MovieCard';
 import MovieSlider from './components/MovieSlider';
+import { options } from './utils/apiOptions';
 
 function App() {
   const [movieList, setMovieList] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const options = {
-      method: 'GET',
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${import.meta.env.VITE_TMDB_READ_TOKEN}`,
-      },
-    };
     const fetchMovies = async () => {
       try {
         setLoading(true);
@@ -44,7 +38,7 @@ function App() {
 
   return (
     <div className="app">
-      <h1>🎬인기 영화 목록</h1>
+      <h1>🎬현재 상영작</h1>
       <div className="movie-slider-container">
         <MovieSlider movies={movieList} />
       </div>

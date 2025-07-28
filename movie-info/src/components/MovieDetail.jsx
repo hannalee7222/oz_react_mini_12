@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import './MovieDetail.css';
-
-const options = {
-  method: 'GET',
-  headers: {
-    accept: 'application/json',
-    Authorization: `Bearer ${import.meta.env.VITE_TMDB_READ_TOKEN}`,
-  },
-};
+import { options } from '../utils/apiOptions';
 
 export default function MovieDetail() {
   const { id } = useParams();

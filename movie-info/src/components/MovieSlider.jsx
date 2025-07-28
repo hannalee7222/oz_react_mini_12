@@ -6,36 +6,37 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-
-const options = {
-  method: 'GET',
-  headers: {
-    accept: 'application/json',
-    Authorization: `Bearer ${import.meta.env.VITE_TMDB_READ_TOKEN}`,
-  },
-};
+import { options } from '../utils/apiOptions';
 
 export default function MovieSlider() {
-  const [topMovies, setTopMovies] = useState([]);
+  const [nowMovies, setNowMovies] = useState([]);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTopRated = async () => {
+    const fetchNowPlaying = async () => {
       try {
+        setLoading(true);
         const res = await fetch(
-          'https://api.themoviedb.org/3/movie/upcoming?language=ko-KR&page=1',
+          'https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1',
           options
         );
         const data = await res.json();
         const filtered = data.results.filter((movie) => !movie.adult);
-        setTopMovies(filtered);
+        setNowMovies(filtered);
       } catch (error) {
-        console.error('Top rated 데이터를 불러오는 데 실패했습니다.', error);
+        console.error('Now Playing 데이터를 불러오는 데 실패했습니다.', error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchTopRated();
+    fetchNowPlaying();
   }, []);
+
+  if (loading) {
+    return <p className="loading">로딩 중...</p>;
+  }
 
   const handleClick = (id) => {
     navigate(`/details/${id}`);
@@ -49,7 +50,7 @@ export default function MovieSlider() {
       navigation
       pagination={{ clickable: true }}
     >
-      {topMovies.map((movie) => (
+      {nowMovies.map((movie) => (
         <SwiperSlide key={movie.id}>
           <div className="slider-card" onClick={() => handleClick(movie.id)}>
             <img

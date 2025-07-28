@@ -2,14 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MovieCard from './MovieCard';
 import MovieSlider from './MovieSlider';
-
-const options = {
-  method: 'GET',
-  headers: {
-    accept: 'application/json',
-    Authorization: `Bearer ${import.meta.env.VITE_TMDB_READ_TOKEN}`,
-  },
-};
+import { options } from '../utils/apiOptions';
 
 export default function MovieList() {
   const [movies, setMovies] = useState([]);
