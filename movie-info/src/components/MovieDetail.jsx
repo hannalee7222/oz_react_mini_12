@@ -1,33 +1,56 @@
-import React, { useState } from 'react';
-import movieDetailData from '../movieDetailData.json';
+import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import './MovieDetail.css';
+import { options } from '../utils/apiOptions';
 
 export default function MovieDetail() {
-  const [movie] = useState(movieDetailData);
+  const { id } = useParams();
+  const [movie, setMovie] = useState(null);
+
+  useEffect(() => {
+    const fetchMovieDetail = async () => {
+      try {
+        const res = await fetch(
+          `https://api.themoviedb.org/3/movie/${id}?language=ko-KR`,
+          options
+        );
+        const data = await res.json();
+        setMovie(data);
+      } catch (error) {
+        console.error('영화 데이터를 불러오는 데 실패했습니다.', error);
+      }
+    };
+
+    fetchMovieDetail();
+  }, [id]);
+
+  if (!movie) return <p>로딩 중...</p>;
 
   return (
-    <div className="movie-detail">
+    <div className="movie-detail-container">
       <img
-        className="movie-backdrop"
-        src={`https://image.tmdb.org/t/p/w500${movie.backdrop_path || movie.poster_path}`}
+        className="movie-detail-image"
+        src={`https://image.tmdb.org/t/p/w500${
+          movie.backdrop_path || movie.poster_path
+        }`}
         alt={movie.title}
       />
 
-      <div className="movie-info">
-        <div className="title-score">
+      <div className="movie-detail-info">
+        <div className="movie-detail-header">
           <h2>{movie.title}</h2>
-          <span>⭐️{movie.vote_average}</span>
+          <span className="movie-detail-score">⭐️{movie.vote_average}</span>
         </div>
 
-        <div className="genres">
+        <div className="movie-detail-genres">
           {movie.genres.map((genre) => (
-            <span key={genre.id} className="genre">
+            <span key={genre.id} className="genre-badge">
               {genre.name}
             </span>
           ))}
         </div>
 
-        <p className="overview">{movie.overview}</p>
+        <p className="movie-detail-overview">{movie.overview}</p>
       </div>
     </div>
   );

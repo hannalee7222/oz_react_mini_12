@@ -17,7 +17,7 @@ export default function MovieCard({ poster_path, title, vote_average, id }) {
         className="movie-poster"
       />
       <h3 className="movie-title">{title}</h3>
-      <p className="movie-score">평점: {vote_average}</p>
+      <p className="movie-score">⭐️평점: {vote_average}</p>
     </div>
   );
 }
