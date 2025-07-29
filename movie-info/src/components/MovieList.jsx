@@ -35,7 +35,10 @@ export default function MovieList() {
       <div className="movie-slider-container">
         <MovieSlider movies={movies} />
       </div>
-      <div className="movie-list">
+      <div
+        className="flex flex-wrap justify-center
+        gap-5 p-5 md:gap-4 md:p-4 sm:gap-3 sm:p-3"
+      >
         {movies.map((movie) => (
           <MovieCard key={movie.id} movie={movie} onClick={handleClick} />
         ))}
