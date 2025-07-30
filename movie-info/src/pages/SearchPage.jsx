@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import MovieCard from '../components/MovieCard';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -10,6 +10,7 @@ export default function SearchPage() {
   const query = searchParams.get('query');
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const fetchMoviesBySearch = async (query) => {
     try {
@@ -44,6 +45,10 @@ export default function SearchPage() {
     });
   }, [query]);
 
+  const handleClick = (id) => {
+    navigate(`/details/${id}`);
+  };
+
   return (
     <section className="px-4 py-8 max-w-6xl mx-auto">
       <h2 className="text-xl font-bold mb-4">"{query}" 검색 결과</h2>
@@ -61,6 +66,7 @@ export default function SearchPage() {
               poster_path={movie.poster_path}
               title={movie.title}
               vote_average={movie.vote_average}
+              onClick={handleClick}
             />
           ))}
         </div>
