@@ -35,7 +35,7 @@ export default function MovieList() {
       <div className="movie-slider-container">
         <MovieSlider movies={movies} />
       </div>
-      <div className="movie-list">
+      <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {movies.map((movie) => (
           <MovieCard key={movie.id} movie={movie} onClick={handleClick} />
         ))}

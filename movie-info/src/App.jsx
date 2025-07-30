@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import MovieCard from './components/MovieCard';
 import MovieSlider from './components/MovieSlider';
-import { options } from './utils/apiOptions';
+import options from './utils/apiOptions';
 
 function App() {
   const [movieList, setMovieList] = useState([]);
@@ -38,11 +38,17 @@ function App() {
 
   return (
     <div className="app">
-      <h1>🎬현재 상영작</h1>
+      <h1 className="text-xl md:text-2xl font-bold text-black dark:text-white">
+        🎬현재 상영작
+      </h1>
       <div className="movie-slider-container">
         <MovieSlider movies={movieList} />
       </div>
-      <div className="movie-list">
+      <div
+        className="
+       grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5
+      "
+      >
         {movieList.map((movie) => (
           <MovieCard
             key={movie.id}

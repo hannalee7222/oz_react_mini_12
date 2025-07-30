@@ -6,7 +6,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { options } from '../utils/apiOptions';
+import options from '../utils/apiOptions';
 
 export default function MovieSlider() {
   const [nowMovies, setNowMovies] = useState([]);
@@ -44,21 +44,29 @@ export default function MovieSlider() {
 
   return (
     <Swiper
+      className="pb-6 sm:pb-6 md:pb-5"
+      pagination={{ clickable: true }}
+      slidesPerView={4}
       modules={[Navigation, Pagination]}
       spaceBetween={16}
-      slidesPerView={4}
       navigation
-      pagination={{ clickable: true }}
+      breakpoints={{
+        768: { slidesPerView: 3 },
+        1024: { slidesPerView: 5 },
+      }}
     >
       {nowMovies.map((movie) => (
         <SwiperSlide key={movie.id}>
-          <div className="slider-card" onClick={() => handleClick(movie.id)}>
+          <div
+            className="text-center cursor-pointer"
+            onClick={() => handleClick(movie.id)}
+          >
             <img
               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
               alt={movie.title}
-              className="slider-poster"
+              className="w-full aspect-[2/3] object-cover rounded-md transition-transform duration-200 hover:scale-105"
             />
-            <h3 className="slider-title">{movie.title}</h3>
+            <h3 className="mt-2 text-lg md:text-xl font-bold">{movie.title}</h3>
           </div>
         </SwiperSlide>
       ))}
