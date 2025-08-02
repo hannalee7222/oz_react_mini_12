@@ -1,17 +1,16 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
-export default function MovieCard({ poster_path, title, vote_average, id }) {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate(`/details/${id}`);
-  };
-
+export default function MovieCard({
+  poster_path,
+  title,
+  vote_average,
+  id,
+  onClick,
+}) {
   return (
     <div
       className="w-full max-w-[180px] mx-auto flex flex-col items-center cursor-pointer text-center"
-      onClick={handleClick}
+      onClick={() => onClick(id)}
     >
       <img
         src={`https://image.tmdb.org/t/p/w300${poster_path}`}

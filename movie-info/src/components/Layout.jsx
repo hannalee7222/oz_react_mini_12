@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import NavBar from './NavBar';
 import { Outlet } from 'react-router-dom';
+import { useSupabaseAuth } from '../supabase/useSupabaseAuth';
 
 export default function Layout() {
   const [mode, setMode] = useState('light');
+  const { getUserInfo } = useSupabaseAuth();
+
+  useEffect(() => {
+    getUserInfo();
+  }, [getUserInfo]);
 
   // ✅ Tailwind의 dark mode를 위해 html 태그에 직접 클래스 붙이기
   useEffect(() => {

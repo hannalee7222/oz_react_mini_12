@@ -1,47 +1,91 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import AuthForm from '../components/AuthForm';
+import { useSupabaseAuth } from '../supabase/useSupabaseAuth';
+import { useNavigate } from 'react-router-dom';
 
 export default function SignupPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [errors, setErrors] = useState({});
+  const { signUp, getUserInfo } = useSupabaseAuth();
+  const navigate = useNavigate();
+
+  const validate = () => {
+    const newErrors = {};
+    if (!/^[가-힣a-zA-Z0-9]{2,8}$/.test(name))
+      newErrors.name = '이름은 2~8자 이상의 한글, 영문, 숫자만 가능합니다.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      newErrors.email = '이메일 형식이 올바르지 않습니다.';
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password))
+      newErrors.password =
+        '비밀번호는 대소문자, 숫자를 포함한 8자 이상이어야 합니다.';
+    if (confirm !== password)
+      newErrors.confirm = '비밀번호가 일치하지 않습니다.';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSignup = async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    const res = await signUp({ email, password, userName: name });
+
+    if (res.error) {
+      setErrors((prev) => ({ ...prev, email: res.error.message }));
+      return;
+    }
+
+    await getUserInfo();
+    navigate('/');
+
+    console.log('회원가입 시도:', { name, email, password });
+  };
+
+  const fields = [
+    {
+      name: 'name',
+      label: '이름',
+      type: 'text',
+      placeholder: '이름',
+      value: name,
+      onChange: (e) => setName(e.target.value),
+    },
+    {
+      name: 'email',
+      label: '이메일',
+      type: 'email',
+      placeholder: '이메일',
+      value: email,
+      onChange: (e) => setEmail(e.target.value),
+    },
+    {
+      name: 'password',
+      label: '비밀번호',
+      type: 'password',
+      placeholder: '비밀번호',
+      value: password,
+      onChange: (e) => setPassword(e.target.value),
+    },
+    {
+      name: 'confirm',
+      label: '비밀번호 확인',
+      type: 'password',
+      placeholder: '비밀번호 확인',
+      value: confirm,
+      onChange: (e) => setConfirm(e.target.value),
+    },
+  ];
+
   return (
-    <section className="max-w-md mx-auto mt-20 p-8 border border-gray-800 dark:border-gray-200 bg-white dark:bg-gray-400 text-black dark:text-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-center mb-6">회원가입</h2>
-      <form className="flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="이름"
-          required
-          className="p-3 text-base bg-white dark:bg-gray-500 text-black dark:text-white border border-gray-300 dark:border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-        <input
-          type="email"
-          placeholder="이메일"
-          required
-          className="p-3 text-base bg-white dark:bg-gray-500 text-black dark:text-white border border-gray-300 dark:border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-        <input
-          type="password"
-          placeholder="비밀번호"
-          required
-          className="p-3 text-base bg-white dark:bg-gray-500 text-black dark:text-white border border-gray-300 dark:border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-        <input
-          type="password"
-          placeholder="비밀번호 확인"
-          required
-          className="p-3 text-base bg-white dark:bg-gray-500 text-black dark:text-white border border-gray-300 dark:border-gray-400 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
-        />
-        <button
-          type="submit"
-          className="p-3 bg-gray-600 text-white hover:bg-gray-700 transition rounded-md"
-        >
-          회원가입
-        </button>
-      </form>
-      <p className="text-center text-sm mt-4">
-        이미 계정이 있으신가요?{' '}
-        <Link to="/login" className="text-purple-600 hover:underline">
-          로그인
-        </Link>
-      </p>
-    </section>
+    <AuthForm
+      mode="signup"
+      fields={fields}
+      onSubmit={handleSignup}
+      errorMessages={errors}
+    />
   );
 }

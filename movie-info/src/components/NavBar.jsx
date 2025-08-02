@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react';
 import useDebounce from '../hooks/useDebounce';
-import { Link, useNavigate } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { FaUserCircle } from 'react-icons/fa';
+import { useAuthContext } from '../supabase/useAuthContext';
+import { useSupabaseAuth } from '../supabase/useSupabaseAuth';
 
 export default function NavBar({ mode, setMode }) {
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword, 500);
   const navigate = useNavigate();
   const location = useLocation();
+  const { userInfo } = useAuthContext();
+  const { logout } = useSupabaseAuth();
+
+  const toggleMode = () => {
+    setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   useEffect(() => {
     const trimmed = debouncedKeyword.trim();
@@ -33,10 +41,6 @@ export default function NavBar({ mode, setMode }) {
       }
     }
   }, [debouncedKeyword, navigate, location.pathname]);
-
-  const toggleMode = () => {
-    setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
 
   return (
     <nav className="bg-[#111] text-white px-6 py-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -64,20 +68,61 @@ export default function NavBar({ mode, setMode }) {
             {mode === 'light' ? '🌝다크모드' : '🌞라이트모드'}
           </button>
 
-          <Link
-            to="/login"
-            onClick={() => setKeyword('')}
-            className="bg-purple-600 px-4 py-2 rounded-md whitespace-nowrap"
-          >
-            로그인
-          </Link>
-          <Link
-            to="/signup"
-            onClick={() => setKeyword('')}
-            className="bg-purple-600 px-4 py-2 rounded-md whitespace-nowrap"
-          >
-            회원가입
-          </Link>
+          {!userInfo ? (
+            <>
+              <Link
+                to="/login"
+                onClick={() => setKeyword('')}
+                className="bg-purple-600 px-4 py-2 rounded-md whitespace-nowrap"
+              >
+                로그인
+              </Link>
+              <Link
+                to="/signup"
+                onClick={() => setKeyword('')}
+                className="bg-purple-600 px-4 py-2 rounded-md whitespace-nowrap"
+              >
+                회원가입
+              </Link>
+            </>
+          ) : (
+            <div className="relative group">
+              <FaUserCircle
+                size={32}
+                className="text-purple-400 hover:text-purple-500 cursor-pointer"
+              />
+
+              <ul
+                className="
+              absolute right-0 mt-0 w-36 bg-gray-800 border border-gray-700 text-white 
+              rounded shadow-md z-10
+              opacity-0 pointer-events-none
+              group-hover:opacity-100 group-hover:pointer-events-auto
+              transition-opacity duration-200
+              "
+              >
+                <li>
+                  <Link
+                    to="/mypage"
+                    className="block px-4 py-2 hover:bg-gray-700"
+                  >
+                    관심목록
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    className="w-full text-left px-4 py-2 hover:bg-gray-700"
+                    onClick={() => {
+                      logout();
+                      navigate('/');
+                    }}
+                  >
+                    로그아웃
+                  </button>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </nav>
