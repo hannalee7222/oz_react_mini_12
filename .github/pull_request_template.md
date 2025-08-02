@@ -1,21 +1,23 @@
-[mission3] 3단계 미션 구현 - 이한나/개인
+[mission4] 4단계 미션 구현 - 이한나/개인
 
 ## 구현 사항
 
-- NavBar 검색기능 구현하기.
-- useDebounce훅 사용하기.
-- Tailwind CSS사용하여 스타일 적용하기.
-- 다크모드/라이트모드 구현하기.
+- AuthForm 컴포넌트 생성 및 스타일링 적용
+- SignupPage와 LoginPage에서 입력 필드 유효성 검사 추가
+- Supabase 인증 연동: 회원가입 및 로그인 기능 구현
+- 로그인 여부에 따라 NavBar UI 조건부 렌더링
+- 사용자 정보 전역 상태로 관리 (Context + localStorage)
 
 ## 어려웠던 점
 
-- 기존 필터링 조건으로는 검색 결과의 유해한 콘텐츠를 거를 수 없어서... 알아내느라 눈알이 빠질 것 같았으나, 몇 개의 장르 아이디를 거르자 검색 결과가 몹시 클린해졌다.
-- 처음부터 스타일링 프레임워크를 사용했으면 좋았을 텐데, 독립된 CSS파일로 코딩하다가 오늘에서야 tailwind CSS로 교체하느라 힘들었다.
+- 유효성 검사 기능 구현에서 입력한 로직이 반영되지 않고 브라우저 기본 유효성 검사만 이루어져서 많이 헤맸다. 알고보니 noValidate를 추가해야 내가 만든 커스텀 로직이 실행된다는 것을 알았다.
+
+- 기본 제공되는 코드를 보지 않고 스스로 찾아내고 싶어서 시간이 많이 걸렸다. 인터넷의 도움을 많이 받아서 온전히 내 힘으로 작성한 코드라고 할 순 없지만, 그래도 노력을 많이 해서 얻은 결과라서 만족스럽다.
 
 ## 구현 이미지
 
-<img src="https://raw.githubusercontent.com/hannalee7222/oz_react_mini_12/737e9ff7b0833b0407d5eafb83571d77b275dff9/movie-info/public/images/MainPage(dark)_3%EC%9D%BC%EC%B0%A8.png" alt="main 페이지(dark)" width="300" />
-<img src="https://raw.githubusercontent.com/hannalee7222/oz_react_mini_12/737e9ff7b0833b0407d5eafb83571d77b275dff9/movie-info/public/images/MainPage_3%EC%9D%BC%EC%B0%A8.png" alt="main 페이지(light)" width="300" />
-<img src="https://raw.githubusercontent.com/hannalee7222/oz_react_mini_12/737e9ff7b0833b0407d5eafb83571d77b275dff9/movie-info/public/images/Login_SignupPage_3%EC%9D%BC%EC%B0%A8.png" alt="signup/login 페이지(dark,light)" width="300" />
-<img src="https://raw.githubusercontent.com/hannalee7222/oz_react_mini_12/737e9ff7b0833b0407d5eafb83571d77b275dff9/movie-info/public/images/MobilePage_3%EC%9D%BC%EC%B0%A8.png" alt="mobile 페이지(dark)" width="300"  />
-<img src="https://raw.githubusercontent.com/hannalee7222/oz_react_mini_12/737e9ff7b0833b0407d5eafb83571d77b275dff9/movie-info/public/images/SearchPage(dark)_3%EC%9D%BC%EC%B0%A8.png" alt="search 페이지(dark)" width="300"  />
+<img src="https://raw.githubusercontent.com/hannalee7222/oz_react_mini_12/f478aeaf73c33b626d7f8205f52bd4f89f2c440b/movie-info/public/images/4%EC%9D%BC%EC%B0%A8_Login%2CSignup.png" alt="LoginPage/SignupPage" width="500" />
+<img src="https://raw.githubusercontent.com/hannalee7222/oz_react_mini_12/f478aeaf73c33b626d7f8205f52bd4f89f2c440b/movie-info/public/images/4%EC%9D%BC%EC%B0%A8_kakaoLogin.png" alt="kakaoLoginPage" width="500" />
+<video controls width="500">
+  <source src="movie-info/public/images/NavBarDropdown.mov" type="video/quicktime" />
+</video>
