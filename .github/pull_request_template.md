@@ -5,6 +5,7 @@
 - AuthForm 컴포넌트 생성 및 스타일링 적용
 - SignupPage와 LoginPage에서 입력 필드 유효성 검사 추가
 - Supabase 인증 연동: 회원가입 및 로그인 기능 구현
+- Supabase를 활용하여 소셜로그인 구현(kakao, google)
 - 로그인 여부에 따라 NavBar UI 조건부 렌더링
 - 사용자 정보 전역 상태로 관리 (Context + localStorage)
 
@@ -18,6 +19,5 @@
 
 <img src="https://raw.githubusercontent.com/hannalee7222/oz_react_mini_12/f478aeaf73c33b626d7f8205f52bd4f89f2c440b/movie-info/public/images/4%EC%9D%BC%EC%B0%A8_Login%2CSignup.png" alt="LoginPage/SignupPage" width="500" />
 <img src="https://raw.githubusercontent.com/hannalee7222/oz_react_mini_12/f478aeaf73c33b626d7f8205f52bd4f89f2c440b/movie-info/public/images/4%EC%9D%BC%EC%B0%A8_kakaoLogin.png" alt="kakaoLoginPage" width="500" />
-<video controls width="500">
-  <source src="movie-info/public/images/NavBarDropdown.mov" type="video/quicktime" />
-</video>
+
+https://github.com/user-attachments/assets/664303e7-6167-4a5a-8fbf-e17b476ac588
