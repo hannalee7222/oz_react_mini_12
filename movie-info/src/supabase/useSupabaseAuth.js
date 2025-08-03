@@ -38,15 +38,16 @@ export function useSupabaseAuth() {
     if (error) {
       return {
         error: {
-          status: error.status,
-          message: error.message,
+          status: error?.status ?? 500,
+          message:
+            error?.message || '로그인 중 알 수 없는 오류가 발생했습니다.',
         },
       };
     }
     return { user: data.user };
   };
 
-  const loginWithKakao = async () => {
+  const loginWithKakao = useCallback(async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'kakao',
     });
@@ -60,9 +61,8 @@ export function useSupabaseAuth() {
         },
       };
     }
-
     return { user: data?.user };
-  };
+  }, []);
 
   const loginWithGoogle = useCallback(async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
