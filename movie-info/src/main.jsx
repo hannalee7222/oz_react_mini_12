@@ -7,7 +7,7 @@ import SearchPage from './pages/SearchPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { SupabaseProvider } from './supabase/SupabaseProvider.jsx.jsx';
+import { SupabaseProvider } from './supabase/SupabaseProvider.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>

@@ -27,7 +27,7 @@ export default function MovieList() {
   }, []);
 
   const handleClick = (id) => {
-    navigate(`/movies/${id}`);
+    navigate(`/details/${id}`);
   };
 
   return (
