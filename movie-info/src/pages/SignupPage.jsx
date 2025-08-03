@@ -35,7 +35,7 @@ export default function SignupPage() {
     const res = await signUp({ email, password, userName: name });
 
     if (res.error) {
-      setErrors((prev) => ({ ...prev, email: res.error.message }));
+      setErrors((prev) => ({ ...prev, email: '이미 가입된 이메일입니다.' }));
       return;
     }
 

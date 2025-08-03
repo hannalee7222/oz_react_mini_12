@@ -3,7 +3,6 @@ import AuthForm from '../components/AuthForm';
 import { useSupabaseAuth } from '../supabase/useSupabaseAuth';
 import { useNavigate } from 'react-router-dom';
 import KakaoLoginButton from '../components/KakaoLoginButton';
-import { Link } from 'react-router-dom';
 import GoogleLoginButton from '../components/GoogleLoginButton';
 
 export default function LoginPage() {
@@ -11,7 +10,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
 
-  const { login, getUserInfo } = useSupabaseAuth();
+  const { login, getUserInfo, loginWithGoogle, loginWithKakao } =
+    useSupabaseAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -25,7 +25,7 @@ export default function LoginPage() {
     const res = await login({ email, password });
 
     if (res.error) {
-      setErrors({ password: res.error.message });
+      setErrors({ password: '이메일 또는 비밀번호가 일치하지 않습니다.' });
       return;
     }
 
@@ -57,7 +57,6 @@ export default function LoginPage() {
 
   return (
     <section className="max-w-md mx-auto mt-20 p-8 border border-gray-800 dark:border-gray-200 bg-white dark:bg-gray-400 text-black dark:text-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold text-center mb-6">로그인</h2>
       <AuthForm
         mode="login"
         fields={fields}
@@ -65,15 +64,9 @@ export default function LoginPage() {
         errorMessages={errors}
       />
       <div className="flex flex-col gap-1 mt-2 mb-6">
-        <KakaoLoginButton />
-        <GoogleLoginButton />
+        <KakaoLoginButton onClick={loginWithKakao} />
+        <GoogleLoginButton onClick={loginWithGoogle} />
       </div>
-      <p className="text-center text-sm mt-4">
-        계정이 없으신가요?{' '}
-        <Link to="/signup" className="text-purple-600 hover:underline">
-          회원가입
-        </Link>
-      </p>
     </section>
   );
 }
