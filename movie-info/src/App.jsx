@@ -5,17 +5,12 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import MovieCard from './components/MovieCard';
 import MovieSlider from './components/MovieSlider';
-import { useSupabaseAuth } from './supabase/useSupabaseAuth';
+
 import options from './utils/apiOptions';
 
 function App() {
   const [movieList, setMovieList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { getUserInfo } = useSupabaseAuth();
-
-  useEffect(() => {
-    getUserInfo();
-  }, [getUserInfo]);
 
   useEffect(() => {
     const fetchMovies = async () => {
