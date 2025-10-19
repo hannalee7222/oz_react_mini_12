@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import useDebounce from '../hooks/useDebounce';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
@@ -10,6 +10,7 @@ export default function NavBar({ mode, setMode }) {
   const debouncedKeyword = useDebounce(keyword, 500);
   const navigate = useNavigate();
   const location = useLocation();
+  const inputRef = useRef(null);
   const { userInfo } = useAuthContext();
   const { logout } = useSupabaseAuth();
 
@@ -20,6 +21,8 @@ export default function NavBar({ mode, setMode }) {
   useEffect(() => {
     const trimmed = debouncedKeyword.trim();
     const isInvalidKoreanChar = /^[ㄱ-ㅎ]$/.test(trimmed);
+    const isSearchInputFocused = document.activeElement === inputRef.current;
+    if (!isSearchInputFocused) return;
 
     if (trimmed !== '' && !isInvalidKoreanChar) {
       const params = new URLSearchParams({ query: trimmed });
@@ -33,7 +36,7 @@ export default function NavBar({ mode, setMode }) {
           },
           { replace: true }
         ); // replace 안 하면 뒤로 가기 쌓임
-      } else if (!location.pathname.startsWith('/details')) {
+      } else {
         navigate({
           pathname: '/search',
           search: params.toString(),
@@ -41,6 +44,12 @@ export default function NavBar({ mode, setMode }) {
       }
     }
   }, [debouncedKeyword, navigate, location.pathname]);
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/details')) {
+      setKeyword('');
+    }
+  }, [location.pathname]);
 
   return (
     <nav className="bg-[#111] text-white px-6 py-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -54,6 +63,7 @@ export default function NavBar({ mode, setMode }) {
       <div className="flex items-center justify-between flex-1 gap-4 flex-wrap md:flex-nowrap w-full">
         <input
           type="text"
+          ref={inputRef}
           className="w-full sm:w-[400px] px-3 py-2 rounded-md border-none outline-none text-black placeholder-gray-400"
           placeholder="영화 검색..."
           value={keyword}
