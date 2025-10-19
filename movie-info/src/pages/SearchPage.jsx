@@ -66,7 +66,7 @@ export default function SearchPage() {
               poster_path={movie.poster_path}
               title={movie.title}
               vote_average={movie.vote_average}
-              onClick={handleClick}
+              onClick={() => handleClick(movie.id)}
             />
           ))}
         </div>
