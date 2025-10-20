@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import options from '../utils/apiOptions';
+
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 export default function MovieDetail() {
   const { id } = useParams();
@@ -10,9 +11,10 @@ export default function MovieDetail() {
     const fetchMovieDetail = async () => {
       try {
         const res = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?language=ko-KR`,
-          options
+          `https://api.themoviedb.org/3/movie/${id}?language=ko-KR&api_key=${API_KEY}`
         );
+
+        if (!res.ok) throw new Error('영화 데이터를 불러오는 데 실패했습니다.');
         const data = await res.json();
         setMovie(data);
       } catch (error) {
