@@ -29,16 +29,14 @@ export default function SearchPage() {
 
   useEffect(() => {
     if (!query) return;
-
     setLoading(true);
     fetchMoviesBySearch(query).then((results) => {
       const filtered = results.filter((movie) => {
         const genres = movie.genre_ids || [];
 
-        const hasDramaAndRomance =
-          genres.includes(18) || genres.includes(10749);
+        const hasDramaOrRomance = genres.includes(18) || genres.includes(10749);
 
-        return movie.adult === false && !hasDramaAndRomance;
+        return movie.adult === false && !hasDramaOrRomance;
       });
       setMovies(filtered);
       setLoading(false);
