@@ -6,20 +6,23 @@ import './App.css';
 import MovieCard from './components/MovieCard';
 import MovieSlider from './components/MovieSlider';
 
-import options from './utils/apiOptions';
+import { useNavigate } from 'react-router-dom';
+
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 function App() {
   const [movieList, setMovieList] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
         setLoading(true);
         const res = await fetch(
-          'https://api.themoviedb.org/3/movie/popular?language=ko-KR&page=1',
-          options
+          `https://api.themoviedb.org/3/movie/popular?language=ko-KR&page=1&api_key=${API_KEY}`
         );
+        if (!res.ok) throw new Error('영화 데이터를 불러오는 데 실패했습니다.');
         const data = await res.json();
         const filtered = data.results.filter((movie) => movie.adult === false);
         setMovieList(filtered);
@@ -36,6 +39,10 @@ function App() {
   if (loading) {
     return <p className="loading">로딩 중...</p>;
   }
+
+  const handleClick = (id) => {
+    navigate(`/details/${id}`);
+  };
 
   return (
     <div className="app">
@@ -57,6 +64,7 @@ function App() {
             poster_path={movie.poster_path}
             title={movie.title}
             vote_average={movie.vote_average}
+            onClick={handleClick}
           />
         ))}
       </div>
