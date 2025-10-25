@@ -89,17 +89,31 @@ export function useSupabaseAuth() {
       return { error: { status: error.status, message: error.message } };
     }
 
-    if (data?.user) {
-      const userData = {
-        id: data.user.id,
-        email: data.user.email,
-        userName: data.user.user_metadata?.userName || '',
-        profileImageUrl: data.user.user_metadata?.profileImageUrl || '',
-      };
+    const authedUser = data?.user;
+    if (!authedUser) return;
 
-      localStorage.setItem('userInfo', JSON.stringify(userData));
-      setUserInfo(userData);
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('nickname, avatar_url')
+      .eq('id', authedUser.id)
+      .single();
+
+    if (profileError && profileError.code !== 'PGRST116') {
+      console.error('프로필 불러오기 실패:', profileError.message);
     }
+    const userData = {
+      id: authedUser.id,
+      email: authedUser.email,
+      userName:
+        profileData?.nickname || authedUser.user_metadata?.userName || '',
+      profileImageUrl:
+        profileData?.avatar_url ||
+        authedUser.user_metadata?.profileImageUrl ||
+        '',
+    };
+
+    localStorage.setItem('userInfo', JSON.stringify(userData));
+    setUserInfo(userData);
   }, [setUserInfo]);
 
   const logout = async () => {
