@@ -11,8 +11,19 @@ export function SupabaseProvider({ children }) {
     }
   }, []);
 
+  //닉네임(상단메뉴 바) 수정 함수
+  const updateUserName = (newName) => {
+    setUserInfo((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev, userName: newName };
+      localStorage.setItem('userInfo', JSON.stringify(updated));
+      //저장 후 갱신
+      return updated;
+    });
+  };
+
   return (
-    <AuthContext.Provider value={{ userInfo, setUserInfo }}>
+    <AuthContext.Provider value={{ userInfo, setUserInfo, updateUserName }}>
       {children}
     </AuthContext.Provider>
   );
