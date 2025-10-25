@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage.jsx';
 import SignupPage from './pages/SignupPage.jsx';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { SupabaseProvider } from './supabase/SupabaseProvider.jsx';
+import MyPage from './pages/MyPage.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
@@ -15,6 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<App />} />
+          <Route path="/mypage" element={<MyPage />} />
           <Route path="details/:id" element={<MovieDetail />} />
           <Route path="search" element={<SearchPage />} />
           <Route path="login" element={<LoginPage />} />
