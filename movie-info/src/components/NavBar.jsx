@@ -4,6 +4,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
 import { useAuthContext } from '../supabase/useAuthContext';
 import { useSupabaseAuth } from '../supabase/useSupabaseAuth';
+import { useThemeStore } from '../store/useThemeStore';
 
 function SunIcon({ className = 'w-6 h-6' }) {
   return (
@@ -30,7 +31,10 @@ function MoonIcon({ className = 'w-6 h-6' }) {
   );
 }
 
-export default function NavBar({ mode, setMode }) {
+export default function NavBar() {
+  const mode = useThemeStore((state) => state.mode);
+  const toggleMode = useThemeStore((state) => state.toggleMode);
+
   const [keyword, setKeyword] = useState('');
   const debouncedKeyword = useDebounce(keyword, 500);
   const navigate = useNavigate();
@@ -38,10 +42,6 @@ export default function NavBar({ mode, setMode }) {
   const inputRef = useRef(null);
   const { userInfo } = useAuthContext();
   const { logout } = useSupabaseAuth();
-
-  const toggleMode = () => {
-    setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
 
   useEffect(() => {
     const trimmed = debouncedKeyword.trim();

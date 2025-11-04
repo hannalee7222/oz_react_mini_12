@@ -1,57 +1,136 @@
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 import MovieCard from './components/MovieCard';
 import MovieSlider from './components/MovieSlider';
-
 import { useNavigate } from 'react-router-dom';
+import { throttle } from 'lodash';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 function App() {
   const [movieList, setMovieList] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  //무한 스크롤 상태
+  const [page, setPage] = useState(1); //현재 페이지
+  const [hasMore, setHasMore] = useState(true); //대기 페이지
+  const [isFetching, setIsFetching] = useState(false); //fetching 여부확인
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        setLoading(true);
-        const res = await fetch(
-          `https://api.themoviedb.org/3/movie/popular?language=ko-KR&page=1&api_key=${API_KEY}`
-        );
-        if (!res.ok) throw new Error('영화 데이터를 불러오는 데 실패했습니다.');
-        const data = await res.json();
-        const filtered = data.results.filter((movie) => movie.adult === false);
-        setMovieList(filtered);
-      } catch (error) {
-        console.error('영화 데이터를 불러오는 데 실패했습니다.', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const pageRef = useRef(page);
+  const hasMoreRef = useRef(hasMore);
+  const isFetchingRef = useRef(isFetching);
+  const fetchMoviesRef = useRef(null);
 
-    fetchMovies();
+  useEffect(() => {
+    pageRef.current = page;
+  }, [page]);
+  useEffect(() => {
+    hasMoreRef.current = hasMore;
+  }, [hasMore]);
+  useEffect(() => {
+    isFetchingRef.current = isFetching;
+  }, [isFetching]);
+
+  const fetchMovies = useCallback(async (pageToLoad) => {
+    try {
+      setIsFetching(true);
+      if (pageToLoad === 1) {
+        setLoading(true);
+      }
+
+      const res = await fetch(
+        `https://api.themoviedb.org/3/movie/popular?language=ko-KR&page=${pageToLoad}&api_key=${API_KEY}`
+      );
+      if (!res.ok) throw new Error('영화 데이터를 불러오는 데 실패했습니다.');
+      const data = await res.json();
+
+      //유해물 최대한 차단
+      const filtered = data.results.filter((movie) => movie.adult === false);
+
+      //페이지 1이면 filtered 기본세팅, 그 이후로는 이어붙이기
+      setMovieList((prev) =>
+        pageToLoad === 1 ? filtered : [...prev, ...filtered]
+      );
+
+      //페이지 여부 확인
+      if (pageToLoad >= data.total_pages) {
+        setHasMore(false);
+      } else {
+        setHasMore(true);
+      }
+
+      //현재 페이지 갱신
+      setPage(pageToLoad);
+    } catch (error) {
+      console.error('영화 데이터를 불러오는 데 실패했습니다.', error);
+    } finally {
+      setIsFetching(false);
+      setLoading(false);
+    }
   }, []);
 
-  if (loading) {
-    return <p className="loading">로딩 중...</p>;
-  }
+  useEffect(() => {
+    fetchMoviesRef.current = fetchMovies;
+  }, [fetchMovies]);
+
+  useEffect(() => {
+    fetchMovies(1);
+  }, [fetchMovies]);
+
+  const handleScrollThrottled = useMemo(
+    () =>
+      throttle(() => {
+        if (isFetchingRef.current) return;
+        if (!hasMoreRef.current) return;
+
+        const scrollPosition = window.scrollY + window.innerHeight;
+        const threshold = document.documentElement.scrollHeight - 200;
+
+        //한계점 도달하면 다음 페이지 요청
+        if (scrollPosition >= threshold) {
+          const nextPage = (pageRef.current ?? 1) + 1;
+          fetchMoviesRef.current?.(nextPage);
+        }
+      }, 300), //300ms마다 라는 조건걸기
+    []
+  );
+
+  //스크롤 이벤트
+  useEffect(() => {
+    window.addEventListener('scroll', handleScrollThrottled);
+    return () => {
+      //이벤트 cleanup
+      window.removeEventListener('scroll', handleScrollThrottled);
+    };
+  }, [handleScrollThrottled]);
+
+  useEffect(() => {
+    return () => handleScrollThrottled.cancel();
+  }, [handleScrollThrottled]);
 
   const handleClick = (id) => {
     navigate(`/details/${id}`);
   };
+
+  if (loading && page === 1) {
+    return <p className="loading">로딩 중...</p>;
+  }
 
   return (
     <div className="app">
       <h1 className="text-xl md:text-2xl font-bold text-black dark:text-white">
         🎬현재 상영작
       </h1>
+
+      {/*슬라이더 -> page=1 기준으로 사용 */}
       <div className="movie-slider-container">
-        <MovieSlider movies={movieList} />
+        <MovieSlider movies={movieList.slice(0, 10)} />
       </div>
+
       <div
         className="
        grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5
@@ -68,6 +147,16 @@ function App() {
           />
         ))}
       </div>
+
+      {/*추가 로딩 상태 표시 */}
+      {isFetching && (
+        <p className="text-center text-gray-500 py-4">영화 불러오는 중...</p>
+      )}
+      {!hasMore && (
+        <p className="text-center text-gray-400 py-4 text-sm">
+          모든 영화 정보를 다 불러왔어요.
+        </p>
+      )}
     </div>
   );
 }
