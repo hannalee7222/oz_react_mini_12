@@ -2,6 +2,12 @@ import { useEffect, useState } from 'react';
 import { useAuthContext } from '../supabase/useAuthContext';
 import { supabase } from '../supabase/supabaseClient';
 import { FaTrashAlt } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import {
+  getMyBookmarks,
+  clearAllBookmarks,
+  removeBookmark,
+} from '../supabase/bookmarks';
 
 export default function MyPage() {
   const { userInfo: user, updateUserName } = useAuthContext();
@@ -9,6 +15,8 @@ export default function MyPage() {
   const [isEditingNickname, setIsEditingNickname] = useState(false);
   const [profileImgUrl, setProfileImgUrl] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [bookmarks, setBookmarks] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) return;
@@ -68,8 +76,7 @@ export default function MyPage() {
 
   const handleProfileImgChange = async (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    if (!user) return;
+    if (!file || !user) return;
 
     try {
       setUploading(true);
@@ -114,6 +121,44 @@ export default function MyPage() {
       setUploading(false);
     }
   };
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const list = await getMyBookmarks(user.id);
+        setBookmarks(list);
+      } catch (e) {
+        console.error('북마크 불러오기 실패', e);
+      }
+    })();
+  }, [user]);
+
+  const handleClear = async () => {
+    if (!user) return;
+    if (!confirm('모든 북마크를 삭제할까요?')) return;
+    try {
+      await clearAllBookmarks(user.id);
+      setBookmarks([]);
+    } catch (e) {
+      console.error('전체 삭제 실패', e);
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  const handleRemoveOne = async (movieId) => {
+    if (!user) return;
+    try {
+      await removeBookmark(user.id, movieId);
+      setBookmarks((prev) => prev.filter((b) => b.movie_id !== movieId));
+    } catch (e) {
+      console.error('개별 삭제 실패', e);
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  //상세 페이지 이동
+  const goDetail = (movieId) => navigate(`/details/${movieId}`);
 
   return (
     <div className="flex flex-col items-center py-12 text-center">
@@ -194,10 +239,46 @@ export default function MyPage() {
       <div className="w-full max-w-4xl text-left">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">북마크</h3>
-          <FaTrashAlt className="text-red-500 cursor-pointer" />
+          <button
+            onClick={handleClear}
+            title="모두 삭제"
+            className="text-red-500 hover:text-red-600"
+          >
+            <FaTrashAlt className="cursor-pointer" />
+          </button>
         </div>
+        {bookmarks.length === 0 ? (
+          <p className="text-sm text-gray-500">
+            아직 북마크한 영화가 없습니다.
+          </p>
+        ) : (
+          <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4">
+            {bookmarks.map((b) => (
+              <div key={b.id} className="relative group">
+                <img
+                  onClick={() => goDetail(b.movie_id)}
+                  src={`https://image.tmdb.org/t/p/w300${b.poster_path ?? ''}`}
+                  alt={b.title}
+                  className="w-full h-[220px] object-cover rounded-lg cursor-pointer"
+                />
+                <div className="mt-1 text-sm font-semibold truncate">
+                  {b.title}
+                </div>
+                <div className="text-xs text-gray-500">
+                  ⭐️ {Number(b.vote_average ?? 0).toFixed(1)}
+                </div>
 
-        <p className="text-sm text-gray-500">아직 북마크한 영화가 없습니다.</p>
+                <button
+                  onClick={() => handleRemoveOne(b.movie_id)}
+                  className="absolute top-2 right-2 text-xs bg-white/90 text-black px-2 py-1 rounded shadow hover:bg-white"
+                  title="북마크 해제"
+                >
+                  해제
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
