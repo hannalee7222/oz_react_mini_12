@@ -6,7 +6,8 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import options from '../utils/apiOptions';
+
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 export default function MovieSlider() {
   const [nowMovies, setNowMovies] = useState([]);
@@ -18,9 +19,10 @@ export default function MovieSlider() {
       try {
         setLoading(true);
         const res = await fetch(
-          'https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1',
-          options
+          `https://api.themoviedb.org/3/movie/now_playing?language=ko-KR&page=1&api_key=${API_KEY}`
         );
+
+        if (!res.ok) throw new Error('Now Playing 데이터 요청 실패');
         const data = await res.json();
         const filtered = data.results.filter((movie) => !movie.adult);
         setNowMovies(filtered);

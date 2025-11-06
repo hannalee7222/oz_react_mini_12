@@ -1,14 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import NavBar from './NavBar';
 import { Outlet } from 'react-router-dom';
 import { useSupabaseAuth } from '../supabase/useSupabaseAuth';
+import { supabase } from '../supabase/supabaseClient';
+import { useThemeStore } from '../store/useThemeStore';
 
 export default function Layout() {
-  const [mode, setMode] = useState('light');
   const { getUserInfo } = useSupabaseAuth();
+  const mode = useThemeStore((state) => state.mode);
 
   useEffect(() => {
-    getUserInfo();
+    //세션 준비 전 확인
+    const init = async () => {
+      const { data } = await supabase.auth.getSession();
+
+      //세션 준비됐으면 실행
+      if (data?.session) {
+        getUserInfo();
+      }
+    };
+    init();
   }, [getUserInfo]);
 
   // ✅ Tailwind의 dark mode를 위해 html 태그에 직접 클래스 붙이기
@@ -25,7 +36,7 @@ export default function Layout() {
 
   return (
     <>
-      <NavBar mode={mode} setMode={setMode} />
+      <NavBar />
       <main className="min-h-screen bg-white text-black dark:bg-black dark:text-white px-5 py-6">
         <Outlet />
       </main>

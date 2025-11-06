@@ -1,11 +1,14 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
-export default function MovieCard({ poster_path, title, vote_average, id }) {
-  const navigate = useNavigate();
-
+export default function MovieCard({
+  poster_path,
+  title,
+  vote_average,
+  id,
+  onClick,
+}) {
   const handleClick = () => {
-    navigate(`/details/${id}`);
+    if (onClick) onClick(id);
   };
 
   return (
