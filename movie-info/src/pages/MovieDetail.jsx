@@ -7,6 +7,7 @@ import {
   removeBookmark,
   isBookmarked,
 } from '../supabase/bookmarks';
+import CommentsSection from '../components/CommentsSection';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -125,6 +126,7 @@ export default function MovieDetail() {
           {movie.overview}
         </p>
       </div>
+      <CommentsSection movieId={Number(id)} movie={movie} />
     </div>
   );
 }

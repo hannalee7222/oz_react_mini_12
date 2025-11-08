@@ -8,6 +8,7 @@ import {
   clearAllBookmarks,
   removeBookmark,
 } from '../supabase/bookmarks';
+import { listMyComments, deleteMyComment } from '../supabase/comments';
 
 export default function MyPage() {
   const { userInfo: user, updateUserName } = useAuthContext();
@@ -16,6 +17,8 @@ export default function MyPage() {
   const [profileImgUrl, setProfileImgUrl] = useState('');
   const [uploading, setUploading] = useState(false);
   const [bookmarks, setBookmarks] = useState([]);
+  const [myComments, setMyComments] = useState([]);
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -157,6 +160,32 @@ export default function MyPage() {
     }
   };
 
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      try {
+        const rows = await listMyComments(user.id);
+        setMyComments(rows);
+      } catch (e) {
+        console.error('내 댓글 불러오기 실패', e);
+      }
+    })();
+  }, [user]);
+
+  const removeMyComment = async (commentId) => {
+    if (!confirm('댓글을 삭제할까요?')) return;
+    try {
+      setDeletingCommentId(commentId);
+      await deleteMyComment(commentId);
+      setMyComments((prev) => prev.filter((c) => c.id !== commentId));
+    } catch (e) {
+      console.error('내 댓글 삭제 실패', e);
+      alert('삭제 중 오류가 발생했습니다.');
+    } finally {
+      setDeletingCommentId(null);
+    }
+  };
+
   //상세 페이지 이동
   const goDetail = (movieId) => navigate(`/details/${movieId}`);
 
@@ -278,6 +307,66 @@ export default function MyPage() {
               </div>
             ))}
           </div>
+        )}
+      </div>
+
+      <hr className="w-full border-gray-300 my-6" />
+
+      {/*내가 남긴 댓글 */}
+      <div className="w-full max-w-4xl text-left">
+        <h3 className="text-lg font-semibold mb-4">내가 남긴 댓글</h3>
+        {myComments.length === 0 ? (
+          <p className="text-sm text-gray-500">아직 댓글이 없습니다.</p>
+        ) : (
+          <ul className="space-y-3">
+            {myComments.map((c) => (
+              <li key={c.id} className="border rounded-md p-3">
+                <div className="flex items-center justify-between">
+                  <div
+                    className="flex items-center gap-3 cursor-pointer"
+                    onClick={() => goDetail(c.movie_id)}
+                    title="상세 페이지로 이동"
+                  >
+                    {c.poster_path ? (
+                      <img
+                        src={`https://image.tmdb.org/t/p/w92${c.poster_path}`}
+                        alt={c.movie_title || 'poster'}
+                        className="w-[46px] h-[69px] object-cover rounded"
+                      />
+                    ) : (
+                      <div className="w-[46px] h-[69px] bg-gray-200 rounded flex items-center justify-center text-xs text-gray-500">
+                        no img
+                      </div>
+                    )}
+                    <div>
+                      <div className="font-semibold text-sm truncate max-w-[200px]">
+                        {c.movie_title || `영화 #${c.movie_id}`}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {c.mood || '💬'} ·{' '}
+                        {new Date(c.created_at).toLocaleString()}
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => removeMyComment(c.id)}
+                    className="text-xs bg-white/90 text-red-500 px-2 py-1 rounded shadow hover:bg-white"
+                    disabled={deletingCommentId === c.id}
+                    title="댓글 삭제"
+                  >
+                    {deletingCommentId === c.id ? '삭제 중...' : '삭제'}
+                  </button>
+                </div>
+
+                {c.content && (
+                  <p className="mt-2 text-sm whitespace-pre-wrap break-words">
+                    {c.content}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </div>
