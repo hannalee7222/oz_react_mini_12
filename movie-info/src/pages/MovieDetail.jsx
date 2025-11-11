@@ -19,7 +19,7 @@ export default function MovieDetail() {
   const { userInfo: user } = useAuthContext(); //로그인 여부 확인
 
   useEffect(() => {
-    const fetchMovieDetail = async () => {
+    (async () => {
       try {
         const res = await fetch(
           `https://api.themoviedb.org/3/movie/${id}?language=ko-KR&api_key=${API_KEY}`
@@ -31,9 +31,7 @@ export default function MovieDetail() {
       } catch (error) {
         console.error(error);
       }
-    };
-
-    fetchMovieDetail();
+    })();
   }, [id]);
 
   //북마크 초기 상태
@@ -76,57 +74,62 @@ export default function MovieDetail() {
   if (!movie) return <p className="text-center py-10">로딩 중...</p>;
 
   return (
-    <div className="flex flex-col lg:flex-row gap-6 p-4 lg:p-6 max-w-5xl mx-auto bg-white rounded-xl shadow-md mt-10">
-      <img
-        className="w-full lg:w-[300px] h-auto object-cover rounded-lg"
-        src={`https://image.tmdb.org/t/p/w500${
-          movie.backdrop_path || movie.poster_path
-        }`}
-        alt={movie.title}
-      />
+    <>
+      {/*영화 상세 정보 섹션 */}
+      <section className="max-w-5xl mx-auto mt-10 p-4 lg:p-6 bg-white rounded-xl shadow-md">
+        <div className="flex flex-col lg:flex-row gap-6 ">
+          <img
+            className="w-full lg:w-[300px] h-auto object-cover rounded-lg"
+            src={`https://image.tmdb.org/t/p/w500${
+              movie.backdrop_path || movie.poster_path
+            }`}
+            alt={movie.title}
+          />
 
-      <div className="flex-1 flex flex-col">
-        <div className="flex justify-between items-start mb-2">
-          <h2 className="text-xl md:text-2xl font-bold text-black ">
-            {movie.title}
-          </h2>
-          <div className="flex items-center gap-3">
-            <span className="text-yellow-500 text-lg font-semibold">
-              ⭐️{movie.vote_average}
-            </span>
-            <button
-              type="button"
-              onClick={toggleBookmark}
-              disabled={busy}
-              aria-label={booked ? '북마크 해제' : '북마크 추가'}
-              className="p-1 rounded-md hover:bg-gray-100 active:scale-95 transition"
-              title={booked ? '북마크 해제' : '북마크 해제'}
-            >
-              {booked ? (
-                <HiBookmark className="w-6 h-6 text-red-500" />
-              ) : (
-                <HiOutlineBookmark className="w-6 h-6 text-gray-700" />
-              )}
-            </button>
+          <div className="flex-1 flex flex-col">
+            <div className="flex justify-between items-start mb-2">
+              <h2 className="text-xl md:text-2xl font-bold text-black ">
+                {movie.title}
+              </h2>
+              <div className="flex items-center gap-3">
+                <span className="text-yellow-500 text-lg font-semibold">
+                  ⭐️{movie.vote_average}
+                </span>
+                <button
+                  type="button"
+                  onClick={toggleBookmark}
+                  disabled={busy}
+                  aria-label={booked ? '북마크 해제' : '북마크 추가'}
+                  className="p-1 rounded-md hover:bg-gray-100 active:scale-95 transition"
+                  title={booked ? '북마크 해제' : '북마크 해제'}
+                >
+                  {booked ? (
+                    <HiBookmark className="w-6 h-6 text-red-500" />
+                  ) : (
+                    <HiOutlineBookmark className="w-6 h-6 text-gray-700" />
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 my-3">
+              {movie.genres.map((genre) => (
+                <span
+                  key={genre.id}
+                  className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm"
+                >
+                  {genre.name}
+                </span>
+              ))}
+            </div>
+
+            <p className="text-sm md:text-base text-gray-700 leading-relaxed mt-2">
+              {movie.overview}
+            </p>
           </div>
         </div>
-
-        <div className="flex flex-wrap gap-2 my-3">
-          {movie.genres.map((genre) => (
-            <span
-              key={genre.id}
-              className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm"
-            >
-              {genre.name}
-            </span>
-          ))}
-        </div>
-
-        <p className="text-sm md:text-base text-gray-700 leading-relaxed mt-2">
-          {movie.overview}
-        </p>
-      </div>
+      </section>
       <CommentsSection movieId={Number(id)} movie={movie} />
-    </div>
+    </>
   );
 }

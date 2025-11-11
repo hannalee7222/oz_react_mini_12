@@ -17,7 +17,7 @@ export default function CommentsSection({ movieId, movie }) {
   const [mood, setMood] = useState('');
   const [content, setContent] = useState('');
   const [posting, setPosting] = useState(false);
-  const [deletngId, setDeletingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
 
   const count = list.length;
   const title = useMemo(
@@ -99,9 +99,11 @@ export default function CommentsSection({ movieId, movie }) {
     }
   };
 
+  const placeholder = user ? '댓글 입력' : '로그인 후 이용가능합니다.';
+
   return (
     <section className="max-w-5xl mx-auto mt-8 p-4 lg:p-6 bg-white rounded-xl shadow">
-      <h3 className="text-lg font-semibold mb-4">{title}</h3>
+      <h3 className="text-lg text-gray-900 font-semibold mb-4">{title}</h3>
 
       {/*작성 폼 */}
       <form onSubmit={onSubmit} className="mb-6">
@@ -132,7 +134,7 @@ export default function CommentsSection({ movieId, movie }) {
 
         <textarea
           className="w-full border border-gray-300 rounded-md p-2 text-sm resize-y min-h-[80px] focus:outline-none focus:ring-2 focus:ring-red-300"
-          placeholder="로그인 후 이용가능합니다."
+          placeholder={placeholder}
           value={content}
           onChange={(e) => setContent(e.target.value)}
           onFocus={guardLoginFocus}
@@ -170,9 +172,9 @@ export default function CommentsSection({ movieId, movie }) {
                   <button
                     onClick={() => onDelete(c.id)}
                     className="text-xs text-red-500 hover:text-red-600"
-                    disabled={deletngId === c.id}
+                    disabled={deletingId === c.id}
                   >
-                    {deletngId === c.id ? '삭제 중...' : '삭제'}
+                    {deletingId === c.id ? '삭제 중...' : '삭제'}
                   </button>
                 )}
               </div>
