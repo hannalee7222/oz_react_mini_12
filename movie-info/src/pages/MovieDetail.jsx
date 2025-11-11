@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { HiOutlineBookmark, HiBookmark } from 'react-icons/hi2';
 import { useAuthContext } from '../supabase/useAuthContext';
+import { useNavigate } from 'react-router-dom';
 import {
   addBookmark,
   removeBookmark,
@@ -17,6 +18,7 @@ export default function MovieDetail() {
   const [busy, setBusy] = useState(false);
   const [booked, setBooked] = useState(false);
   const { userInfo: user } = useAuthContext(); //로그인 여부 확인
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -50,6 +52,7 @@ export default function MovieDetail() {
   const toggleBookmark = async () => {
     if (!user) {
       alert('로그인 후 북마크를 사용할 수 있어요.');
+      navigate('/login');
       return;
     }
     if (!movie) return;
