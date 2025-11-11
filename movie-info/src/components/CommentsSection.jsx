@@ -133,7 +133,7 @@ export default function CommentsSection({ movieId, movie }) {
         </div>
 
         <textarea
-          className="w-full border border-gray-300 rounded-md p-2 text-sm resize-y min-h-[80px] focus:outline-none focus:ring-2 focus:ring-red-300"
+          className="w-full border border-gray-300 text-gray-900 rounded-md p-2 text-sm resize-y min-h-[80px] focus:outline-none focus:ring-2 focus:ring-red-300"
           placeholder={placeholder}
           value={content}
           onChange={(e) => setContent(e.target.value)}
@@ -179,7 +179,7 @@ export default function CommentsSection({ movieId, movie }) {
                 )}
               </div>
               {c.content && (
-                <p className="mt-2 text-sm whitespace-pre-wrap break-words">
+                <p className="mt-2 text-sm text-gray-900 whitespace-pre-wrap break-words">
                   {c.content}
                 </p>
               )}
