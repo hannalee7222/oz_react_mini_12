@@ -6,6 +6,7 @@ import { useAuthContext } from '../supabase/useAuthContext';
 import { useSupabaseAuth } from '../supabase/useSupabaseAuth';
 import { useThemeStore } from '../store/useThemeStore';
 import { toast } from 'react-toastify';
+import { OTT_PROVIDERS } from '../utils/ottProviders';
 
 function SunIcon({ className = 'w-6 h-6' }) {
   return (
@@ -44,6 +45,10 @@ export default function NavBar() {
   const { userInfo } = useAuthContext();
   const { logout } = useSupabaseAuth();
 
+  const [selectedOtts, setSelectedOtts] = useState([]);
+  const [showOttDropdown, setShowOttDropdown] = useState(false);
+  const ottContainerRef = useRef(null);
+
   useEffect(() => {
     const trimmed = debouncedKeyword.trim();
     const isInvalidKoreanChar = /^[ㄱ-ㅎ]$/.test(trimmed);
@@ -51,7 +56,12 @@ export default function NavBar() {
     if (!isSearchInputFocused) return;
 
     if (trimmed !== '' && !isInvalidKoreanChar) {
-      const params = new URLSearchParams({ query: trimmed });
+      const params = new URLSearchParams();
+      params.set('query', trimmed);
+
+      if (selectedOtts.length > 0) {
+        params.set('ott', selectedOtts.join(','));
+      }
 
       if (location.pathname === '/search') {
         // 현재 페이지가 /search면 replace로 search 값만 바꿈
@@ -69,13 +79,28 @@ export default function NavBar() {
         });
       }
     }
-  }, [debouncedKeyword, navigate, location.pathname]);
+  }, [debouncedKeyword, selectedOtts, navigate, location.pathname]);
 
   useEffect(() => {
     if (location.pathname.startsWith('/details')) {
       setKeyword('');
     }
   }, [location.pathname]);
+
+  //드롭다운이 아닌 다른 곳을 클릭하면 드롭다운 닫혀지도록
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        ottContainerRef.current &&
+        !ottContainerRef.current.contains(e.target)
+      ) {
+        setShowOttDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleMyPageClick = () => {
     if (!userInfo) {
@@ -92,25 +117,74 @@ export default function NavBar() {
     ? `${userInfo.userName || userInfo.email} 님`
     : '방문자 님';
 
+  //ott togle함수
+  const toggleOtt = (id) => {
+    setSelectedOtts((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
   return (
     <nav className="bg-[#111] text-white px-6 py-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
       <Link
         to="/"
         className="text-2xl font-bold no-underline"
-        onClick={() => setKeyword('')}
+        onClick={() => {
+          setKeyword('');
+          setSelectedOtts([]);
+        }}
       >
         OZ 무비<span className="text-purple-500">.</span>
       </Link>
 
       <div className="flex items-center justify-between flex-1 gap-4 flex-wrap md:flex-nowrap w-full">
-        <input
-          type="text"
-          ref={inputRef}
-          className="w-full sm:w-[400px] px-3 py-2 rounded-md border-none outline-none text-black placeholder-gray-400"
-          placeholder="영화 검색..."
-          value={keyword}
-          onChange={(e) => setKeyword(e.target.value)}
-        />
+        <div className="relative w-full sm:w-[400px]" ref={ottContainerRef}>
+          <input
+            type="text"
+            ref={inputRef}
+            className="w-full px-3 py-2 rounded-md border-none outline-none text-black placeholder-gray-400"
+            placeholder="영화 검색..."
+            value={keyword}
+            onChange={(e) => setKeyword(e.target.value)}
+            onFocus={() => setShowOttDropdown(true)} //input 클릭 시 열기
+          />
+
+          {/*ott 체크박스 드롭다운 */}
+          {showOttDropdown && (
+            <div
+              className="
+            absolute left-0 mt-1 w-full rounded-md
+            bg-white text-black border border-gray-300 shadow-lg z-10
+            dark:bg-black dark:text-white dark:border-gray-700
+            "
+            >
+              <ul className="max-h-64 overflow-y-auto py-2 text-sm">
+                {OTT_PROVIDERS.map((provider) => {
+                  const checked = selectedOtts.includes(provider.id);
+                  return (
+                    <li
+                      key={provider.id}
+                      className="
+                        flex items-center px-3 py-1 gap-2 cursor-pointer
+                        hover:bg-gray-800 hover:text-white
+                        dark:hover:bg-white dark:hover:text-black
+                      "
+                      onClick={() => toggleOtt(provider.id)}
+                    >
+                      <input
+                        type="checkbox"
+                        className="accent-purple-500"
+                        checked={checked}
+                        readOnly
+                      />
+                      <span>{provider.label}</span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+        </div>
 
         <div className="ml-auto flex items-center gap-3">
           <span className="hidden sm:inline text-sm text-gray-200">

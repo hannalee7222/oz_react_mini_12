@@ -2,13 +2,30 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { throttle } from 'lodash';
 import MovieCard from '../components/MovieCard';
+import OttFilter from '../components/OttFilter';
+import options from '../utils/apiOptions';
+import { getProviderIdsFromKeys } from '../utils/ottProviders';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
+const WATCH_REGION = 'KR';
 
 export default function SearchPage() {
-  const [searchParams] = useSearchParams();
-  const query = searchParams.get('query');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const query = searchParams.get('query') ?? '';
+
+  const initialOtts = (searchParams.get('ott') ?? '')
+    .split(',')
+    .filter(Boolean);
+
+  const [selectedOtts, setSelectedOtts] = useState(initialOtts);
+
+  useEffect(() => {
+    const ottFromUrl = (searchParams.get('ott') ?? '')
+      .split(',')
+      .filter(Boolean);
+    setSelectedOtts(ottFromUrl);
+  }, [searchParams]);
 
   const [movies, setMovies] = useState([]);
   const [page, setPage] = useState(0);
@@ -33,6 +50,61 @@ export default function SearchPage() {
     isFetchingRef.current = isFetching;
   }, [isFetching]);
 
+  //기존 필터 일단 적용 -> 추후 변경예정
+  const applyBaseFilters = (results = []) => {
+    return results.filter((movie) => {
+      const genres = movie.genre_ids || [];
+      const hasDramaOrRomance = genres.includes(18) || genres.includes(10749);
+      return movie.adult === false && !hasDramaOrRomance;
+    });
+  };
+
+  const filterMoviesByOtt = useCallback(
+    async (moviesToFilter) => {
+      const providerIds = getProviderIdsFromKeys(selectedOtts);
+
+      if (!providerIds.length) return moviesToFilter;
+
+      const providerIdStrings = providerIds.map(String);
+      const filtered = [];
+
+      await Promise.all(
+        moviesToFilter.map(async (movie) => {
+          try {
+            const res = await fetch(
+              `${BASE_URL}/movie/${movie.id}/watch/providers`,
+              options //Bearer 토큰
+            );
+            if (!res.ok) throw new Error('OTT 정보 가져오기 실패');
+            const data = await res.json();
+
+            const country = data.results?.[WATCH_REGION];
+            const allOffers = [
+              ...(country?.flatrate || []),
+              ...(country?.rent || []),
+              ...(country?.buy || []),
+              ...(country?.ads || []),
+              ...(country?.free || []),
+            ];
+
+            const hasProvider = allOffers.some((offer) =>
+              providerIdStrings.includes(String(offer.provider_id))
+            );
+
+            if (hasProvider) {
+              filtered.push(movie);
+            }
+          } catch (err) {
+            console.error('OTT 정보 조회 오류', err);
+          }
+        })
+      );
+
+      return filtered;
+    },
+    [selectedOtts]
+  );
+
   const loadMovies = useCallback(
     async (pageToload) => {
       if (!query) return;
@@ -50,13 +122,9 @@ export default function SearchPage() {
         if (!res.ok) throw new Error('영화 검색 실패');
         const data = await res.json();
 
-        const filtered = (data.results || []).filter((movie) => {
-          const genres = movie.genre_ids || [];
-          const hasDramaOrRomance =
-            genres.includes(18) || genres.includes(10749);
+        let filtered = applyBaseFilters(data.results || []);
 
-          return movie.adult === false && !hasDramaOrRomance;
-        });
+        filtered = await filterMoviesByOtt(filtered);
 
         setMovies((prev) =>
           pageToload === 1 ? filtered : [...prev, ...filtered]
@@ -76,7 +144,7 @@ export default function SearchPage() {
         setLoading(false);
       }
     },
-    [query]
+    [query, filterMoviesByOtt]
   );
 
   const handleScrollThrottled = useMemo(
@@ -127,9 +195,32 @@ export default function SearchPage() {
     navigate(`/details/${id}`);
   };
 
+  //ott필터 변경 시 URL쿼리도 같이 업데이트
+  const handleOttChange = (nextSelected) => {
+    setSelectedOtts(nextSelected);
+
+    const params = new URLSearchParams(searchParams);
+    if (nextSelected.length) {
+      params.set('ott', nextSelected.join(','));
+    } else {
+      params.delete('ott');
+    }
+    setSearchParams(params);
+  };
+
   return (
     <section className="px-4 py-8 max-w-6xl mx-auto">
-      <h2 className="text-xl font-bold mb-4">"{query}" 검색 결과</h2>
+      <h2 className="text-xl font-bold mb-2">
+        "{query}" 검색 결과
+        {selectedOtts.length > 0 && (
+          <span className="text-sm text-purple-300 ml-2">
+            (OTT 필터 적용됨)
+          </span>
+        )}
+      </h2>
+
+      {/*검색 결과 OTT 필터 UI*/}
+      <OttFilter selectedOtts={selectedOtts} onChange={handleOttChange} />
 
       {loading && page === 0 ? (
         <p className="text-sm text-gray-500">🔎검색 중 입니다.</p>
