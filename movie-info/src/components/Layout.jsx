@@ -7,6 +7,7 @@ import { useThemeStore } from '../store/useThemeStore';
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import ScrollTopButton from './ScrollTopButton';
 
 export default function Layout() {
   const { getUserInfo } = useSupabaseAuth();
@@ -48,6 +49,7 @@ export default function Layout() {
         autoClose={2000}
         hideProgressBar={true}
       />
+      <ScrollTopButton />
     </>
   );
 }
