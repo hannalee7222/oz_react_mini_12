@@ -9,6 +9,7 @@ import {
   removeBookmark,
 } from '../supabase/bookmarks';
 import { listMyComments, deleteMyComment } from '../supabase/comments';
+import { toast } from 'react-toastify';
 
 export default function MyPage() {
   const { userInfo: user, updateUserName } = useAuthContext();
@@ -55,7 +56,7 @@ export default function MyPage() {
   //닉네임 저장
   const handleSaveNickname = async () => {
     if (nickname.trim().length < 2) {
-      alert('닉네임은 2글자 이상 입력해주세요.');
+      toast.warn('닉네임은 2글자 이상 입력해주세요.');
       return;
     }
 
@@ -69,7 +70,7 @@ export default function MyPage() {
 
     if (error) {
       console.error('닉네임 저장 실패:', error);
-      alert('닉네임 저장 중 문제가 발생했습니다.');
+      toast.error('닉네임 저장 중 문제가 발생했습니다.');
       return;
     }
     updateUserName(nickname);
@@ -96,7 +97,7 @@ export default function MyPage() {
 
       if (uploadError) {
         console.error('이미지 업로드 실패:', uploadError);
-        alert('이미지 업로드에 실패했습니다.');
+        toast.error('이미지 업로드에 실패했습니다.');
         return;
       }
 
@@ -115,7 +116,7 @@ export default function MyPage() {
 
       if (updateError) {
         console.error('프로필 URL 저장 실패:', updateError);
-        alert('프로필 정보를 저장하지 못했습니다.');
+        toast.error('프로필 정보를 저장하지 못했습니다.');
         return;
       }
 
@@ -145,7 +146,7 @@ export default function MyPage() {
       setBookmarks([]);
     } catch (e) {
       console.error('전체 삭제 실패', e);
-      alert('삭제 중 오류가 발생했습니다.');
+      toast.error('삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -156,7 +157,7 @@ export default function MyPage() {
       setBookmarks((prev) => prev.filter((b) => b.movie_id !== movieId));
     } catch (e) {
       console.error('개별 삭제 실패', e);
-      alert('삭제 중 오류가 발생했습니다.');
+      toast.error('삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -180,7 +181,7 @@ export default function MyPage() {
       setMyComments((prev) => prev.filter((c) => c.id !== commentId));
     } catch (e) {
       console.error('내 댓글 삭제 실패', e);
-      alert('삭제 중 오류가 발생했습니다.');
+      toast.error('삭제 중 오류가 발생했습니다.');
     } finally {
       setDeletingCommentId(null);
     }

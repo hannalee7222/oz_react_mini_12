@@ -9,6 +9,7 @@ import {
   isBookmarked,
 } from '../supabase/bookmarks';
 import CommentsSection from '../components/CommentsSection';
+import { toast } from 'react-toastify';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -51,7 +52,7 @@ export default function MovieDetail() {
 
   const toggleBookmark = async () => {
     if (!user) {
-      alert('로그인 후 북마크를 사용할 수 있어요.');
+      toast.info('로그인 후 북마크를 사용할 수 있어요.');
       navigate('/login');
       return;
     }
@@ -68,7 +69,7 @@ export default function MovieDetail() {
       }
     } catch (e) {
       console.error(e);
-      alert('북마크 처리 중 오류가 발생했어요.');
+      toast.error('북마크 처리 중 오류가 발생했어요.');
     } finally {
       setBusy(false);
     }

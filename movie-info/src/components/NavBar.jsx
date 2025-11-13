@@ -5,6 +5,7 @@ import { FaUserCircle } from 'react-icons/fa';
 import { useAuthContext } from '../supabase/useAuthContext';
 import { useSupabaseAuth } from '../supabase/useSupabaseAuth';
 import { useThemeStore } from '../store/useThemeStore';
+import { toast } from 'react-toastify';
 
 function SunIcon({ className = 'w-6 h-6' }) {
   return (
@@ -78,7 +79,9 @@ export default function NavBar() {
 
   const handleMyPageClick = () => {
     if (!userInfo) {
-      alert('로그인 후 이용가능합니다. 로그인/회원가입 페이지로 이동합니다.');
+      toast.info(
+        '로그인 후 이용가능합니다. 로그인/회원가입 페이지로 이동합니다.'
+      );
       navigate('/login');
       return;
     }

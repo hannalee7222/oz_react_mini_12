@@ -5,6 +5,9 @@ import { useSupabaseAuth } from '../supabase/useSupabaseAuth';
 import { supabase } from '../supabase/supabaseClient';
 import { useThemeStore } from '../store/useThemeStore';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 export default function Layout() {
   const { getUserInfo } = useSupabaseAuth();
   const mode = useThemeStore((state) => state.mode);
@@ -40,6 +43,11 @@ export default function Layout() {
       <main className="min-h-screen bg-white text-black dark:bg-black dark:text-white px-5 py-6">
         <Outlet />
       </main>
+      <ToastContainer
+        position="top-center"
+        autoClose={2000}
+        hideProgressBar={true}
+      />
     </>
   );
 }

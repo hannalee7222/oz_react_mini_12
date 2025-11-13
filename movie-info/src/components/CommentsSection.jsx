@@ -7,6 +7,7 @@ import {
   addComment,
   deleteMyComment,
 } from '../supabase/comments';
+import { toast } from 'react-toastify';
 
 export default function CommentsSection({ movieId, movie }) {
   const { userInfo: user } = useAuthContext();
@@ -45,7 +46,7 @@ export default function CommentsSection({ movieId, movie }) {
 
   const guardLoginFocus = () => {
     if (!user) {
-      alert('로그인 후 이용가능합니다.');
+      toast.info('로그인 후 이용가능합니다.');
       navigate('/login');
       return true;
     }
@@ -55,12 +56,12 @@ export default function CommentsSection({ movieId, movie }) {
   const onSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
-      alert('로그인 후 이용가능합니다.');
+      toast.info('로그인 후 이용가능합니다.');
       navigate('/login');
       return;
     }
     if (!mood && !content.trim()) {
-      alert('이모지 또는 내용을 입력해주세요.');
+      toast.warn('이모지 또는 내용을 입력해주세요.');
       return;
     }
     try {
@@ -78,7 +79,7 @@ export default function CommentsSection({ movieId, movie }) {
       setContent('');
     } catch (e) {
       console.error(e);
-      alert('댓글 등록 중 오류가 발생했어요.');
+      toast.error('댓글 등록 중 오류가 발생했어요.');
     } finally {
       setPosting(false);
     }
@@ -93,7 +94,7 @@ export default function CommentsSection({ movieId, movie }) {
       setList((prev) => prev.filter((c) => c.id !== id));
     } catch (e) {
       console.error(e);
-      alert('삭제 중 오류가 발생했어요.');
+      toast.error('삭제 중 오류가 발생했어요.');
     } finally {
       setDeletingId(null);
     }
