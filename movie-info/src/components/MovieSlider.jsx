@@ -1,6 +1,6 @@
 import './MovieSlider.css';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination } from 'swiper/modules';
+import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
@@ -47,9 +47,8 @@ export default function MovieSlider() {
   return (
     <Swiper
       className="pb-6 sm:pb-6 md:pb-5"
-      pagination={{ clickable: true }}
       slidesPerView={4}
-      modules={[Navigation, Pagination]}
+      modules={[Navigation]}
       spaceBetween={16}
       navigation
       breakpoints={{
