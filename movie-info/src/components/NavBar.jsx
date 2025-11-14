@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useDebounce from '../hooks/useDebounce';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaUserCircle } from 'react-icons/fa';
@@ -63,20 +63,16 @@ export default function NavBar() {
         params.set('ott', selectedOtts.join(','));
       }
 
+      const url = {
+        pathname: '/search',
+        search: params.toString(),
+      };
+
       if (location.pathname === '/search') {
         // 현재 페이지가 /search면 replace로 search 값만 바꿈
-        navigate(
-          {
-            pathname: '/search',
-            search: params.toString(),
-          },
-          { replace: true }
-        ); // replace 안 하면 뒤로 가기 쌓임
+        navigate(url, { replace: true });
       } else {
-        navigate({
-          pathname: '/search',
-          search: params.toString(),
-        });
+        navigate(url);
       }
     }
   }, [debouncedKeyword, selectedOtts, navigate, location.pathname]);
@@ -102,7 +98,7 @@ export default function NavBar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleMyPageClick = () => {
+  const handleMyPageClick = useCallback(() => {
     if (!userInfo) {
       toast.info(
         '로그인 후 이용가능합니다. 로그인/회원가입 페이지로 이동합니다.'
@@ -111,18 +107,20 @@ export default function NavBar() {
       return;
     }
     navigate('/mypage');
-  };
+  }, [userInfo, navigate]);
 
-  const displayName = userInfo
-    ? `${userInfo.userName || userInfo.email} 님`
-    : '방문자 님';
+  const displayName = useMemo(
+    () =>
+      userInfo ? `${userInfo.userName || userInfo.email} 님` : '방문자 님',
+    [userInfo]
+  );
 
   //ott togle함수
-  const toggleOtt = (id) => {
+  const toggleOtt = useCallback((id) => {
     setSelectedOtts((prev) =>
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
-  };
+  }, []);
 
   return (
     <nav className="bg-[#111] text-white px-6 py-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -212,7 +210,7 @@ export default function NavBar() {
                   <li>
                     <Link
                       to="/login"
-                      className="block px-4 py-2 hover:bg=gray-700"
+                      className="block px-4 py-2 hover:bg-gray-700"
                       onClick={() => setKeyword('')}
                     >
                       로그인 / 회원가입

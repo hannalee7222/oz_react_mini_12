@@ -1,18 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { AuthContext } from './authContext';
 
 export function SupabaseProvider({ children }) {
-  const [userInfo, setUserInfo] = useState(null);
-
-  useEffect(() => {
-    const savedUser = localStorage.getItem('userInfo');
-    if (savedUser) {
-      setUserInfo(JSON.parse(savedUser));
+  const [userInfo, setUserInfo] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('userInfo');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
     }
-  }, []);
+  });
 
   //닉네임(상단메뉴 바) 수정 함수
-  const updateUserName = (newName) => {
+  const updateUserName = useCallback((newName) => {
     setUserInfo((prev) => {
       if (!prev) return prev;
       const updated = { ...prev, userName: newName };
@@ -20,11 +20,12 @@ export function SupabaseProvider({ children }) {
       //저장 후 갱신
       return updated;
     });
-  };
+  }, []);
 
-  return (
-    <AuthContext.Provider value={{ userInfo, setUserInfo, updateUserName }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({ userInfo, setUserInfo, updateUserName }),
+    [userInfo, updateUserName]
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

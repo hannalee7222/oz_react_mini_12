@@ -10,8 +10,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
 
-  const { login, getUserInfo, loginWithGoogle, loginWithKakao } =
-    useSupabaseAuth();
+  const { login, getUserInfo } = useSupabaseAuth();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -31,9 +30,6 @@ export default function LoginPage() {
 
     await getUserInfo();
     navigate('/');
-
-    //로그인 시도 확인용
-    console.log('로그인 시도:', { email, password });
   };
 
   const fields = [
@@ -56,17 +52,17 @@ export default function LoginPage() {
   ];
 
   return (
-    <section className="max-w-md mx-auto mt-20 p-8 border border-gray-800 dark:border-gray-200 bg-white dark:bg-gray-400 text-black dark:text-white rounded-lg shadow-md">
+    <>
       <AuthForm
         mode="login"
         fields={fields}
         onSubmit={handleLogin}
         errorMessages={errors}
       />
-      <div className="flex flex-col gap-1 mt-2 mb-6">
-        <KakaoLoginButton onClick={loginWithKakao} />
-        <GoogleLoginButton onClick={loginWithGoogle} />
+      <div className="max-w-md mx-auto flex flex-col gap-1 mt-2 mb-6">
+        <KakaoLoginButton />
+        <GoogleLoginButton />
       </div>
-    </section>
+    </>
   );
 }

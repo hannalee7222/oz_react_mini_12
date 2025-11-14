@@ -116,11 +116,11 @@ export function useSupabaseAuth() {
     setUserInfo(userData);
   }, [setUserInfo]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await supabase.auth.signOut();
     localStorage.removeItem('userInfo');
     setUserInfo(null);
-  };
+  }, [setUserInfo]);
 
   return {
     signUp,

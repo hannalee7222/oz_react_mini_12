@@ -1,13 +1,11 @@
 import 'swiper/css';
 import 'swiper/css/navigation';
-import 'swiper/css/pagination';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 import MovieCard from './components/MovieCard';
 import MovieSlider from './components/MovieSlider';
 import UpcomingSlider from './components/UpcomingSlider';
 import OttSlider from './components/OttSlider';
-
 import { useNavigate } from 'react-router-dom';
 import { throttle } from 'lodash';
 
@@ -26,7 +24,6 @@ function App() {
   const pageRef = useRef(page);
   const hasMoreRef = useRef(hasMore);
   const isFetchingRef = useRef(isFetching);
-  const fetchMoviesRef = useRef(null);
 
   useEffect(() => {
     pageRef.current = page;
@@ -77,10 +74,6 @@ function App() {
   }, []);
 
   useEffect(() => {
-    fetchMoviesRef.current = fetchMovies;
-  }, [fetchMovies]);
-
-  useEffect(() => {
     fetchMovies(1);
   }, [fetchMovies]);
 
@@ -96,10 +89,10 @@ function App() {
         //한계점 도달하면 다음 페이지 요청
         if (scrollPosition >= threshold) {
           const nextPage = (pageRef.current ?? 1) + 1;
-          fetchMoviesRef.current?.(nextPage);
+          fetchMovies(nextPage);
         }
       }, 300), //300ms마다 라는 조건걸기
-    []
+    [fetchMovies]
   );
 
   //스크롤 이벤트
@@ -115,9 +108,12 @@ function App() {
     return () => handleScrollThrottled.cancel();
   }, [handleScrollThrottled]);
 
-  const handleClick = (id) => {
-    navigate(`/details/${id}`);
-  };
+  const handleClick = useCallback(
+    (id) => {
+      navigate(`/details/${id}`);
+    },
+    [navigate]
+  );
 
   if (loading && page === 1) {
     return <p className="loading">로딩 중...</p>;

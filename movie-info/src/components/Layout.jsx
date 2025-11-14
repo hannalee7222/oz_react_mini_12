@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import NavBar from './NavBar';
 import { Outlet } from 'react-router-dom';
 import { useSupabaseAuth } from '../supabase/useSupabaseAuth';
@@ -34,8 +34,6 @@ export default function Layout() {
     } else {
       root.classList.remove('dark');
     }
-
-    console.log('현재 모드:', mode); // ✅ 콘솔 위치: 상태가 바뀔 때마다 확인
   }, [mode]);
 
   return (

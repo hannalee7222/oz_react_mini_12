@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -35,9 +35,12 @@ export default function UpcomingSlider() {
     fetchUpcoming();
   }, []);
 
-  const handleClick = (id) => {
-    navigate(`/details/${id}`);
-  };
+  const handleClick = useCallback(
+    (id) => {
+      navigate(`/details/${id}`);
+    },
+    [navigate]
+  );
 
   if (loading) {
     return <p className="loading">상영 예정작 불러오는 중...</p>;

@@ -3,7 +3,7 @@ import { supabase } from './supabaseClient';
 export async function getMyBookmarks(userId) {
   const { data, error } = await supabase
     .from('bookmarks')
-    .select('*')
+    .select('movie_id,title,poster_path,vote_average,created_at')
     .eq('user_id', userId)
     .order('created_at', { ascending: false });
   if (error) throw error;

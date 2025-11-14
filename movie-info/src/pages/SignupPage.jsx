@@ -41,8 +41,6 @@ export default function SignupPage() {
 
     await getUserInfo();
     navigate('/');
-
-    console.log('회원가입 시도:', { name, email, password });
   };
 
   const fields = [

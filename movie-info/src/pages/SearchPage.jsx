@@ -38,7 +38,6 @@ export default function SearchPage() {
   const pageRef = useRef(page);
   const hasMoreRef = useRef(hasMore);
   const isFetchingRef = useRef(isFetching);
-  const loadMoviesRef = useRef(null);
 
   useEffect(() => {
     pageRef.current = page;
@@ -50,19 +49,15 @@ export default function SearchPage() {
     isFetchingRef.current = isFetching;
   }, [isFetching]);
 
-  //기존 필터 일단 적용 -> 추후 변경예정
   const applyBaseFilters = (results = []) => {
     return results.filter((movie) => {
-      const genres = movie.genre_ids || [];
-      const hasDramaOrRomance = genres.includes(18) || genres.includes(10749);
-      return movie.adult === false && !hasDramaOrRomance;
+      return movie.adult === false;
     });
   };
 
   const filterMoviesByOtt = useCallback(
     async (moviesToFilter) => {
       const providerIds = getProviderIdsFromKeys(selectedOtts);
-
       if (!providerIds.length) return moviesToFilter;
 
       const providerIdStrings = providerIds.map(String);
@@ -123,7 +118,6 @@ export default function SearchPage() {
         const data = await res.json();
 
         let filtered = applyBaseFilters(data.results || []);
-
         filtered = await filterMoviesByOtt(filtered);
 
         setMovies((prev) =>
@@ -159,15 +153,11 @@ export default function SearchPage() {
         //한계점 도달하면 다음 페이지 요청
         if (scrollPosition >= threshold) {
           const nextPage = (pageRef.current ?? 0) + 1;
-          loadMoviesRef.current?.(nextPage);
+          loadMovies(nextPage);
         }
       }, 300), //300ms마다 라는 조건걸기
-    []
+    [loadMovies]
   );
-
-  useEffect(() => {
-    loadMoviesRef.current = loadMovies;
-  }, [loadMovies]);
 
   useEffect(() => {
     if (!query) return;
@@ -191,9 +181,12 @@ export default function SearchPage() {
     return () => handleScrollThrottled.cancel();
   }, [handleScrollThrottled]);
 
-  const handleClick = (id) => {
-    navigate(`/details/${id}`);
-  };
+  const handleClick = useCallback(
+    (id) => {
+      navigate(`/details/${id}`);
+    },
+    [navigate]
+  );
 
   //ott필터 변경 시 URL쿼리도 같이 업데이트
   const handleOttChange = (nextSelected) => {
@@ -236,7 +229,7 @@ export default function SearchPage() {
                 poster_path={movie.poster_path}
                 title={movie.title}
                 vote_average={movie.vote_average}
-                onClick={() => handleClick(movie.id)}
+                onClick={handleClick}
               />
             ))}
           </div>

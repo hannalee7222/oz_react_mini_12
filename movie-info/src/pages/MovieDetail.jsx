@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { HiOutlineBookmark, HiBookmark } from 'react-icons/hi2';
 import { useAuthContext } from '../supabase/useAuthContext';
@@ -15,6 +15,8 @@ const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
 export default function MovieDetail() {
   const { id } = useParams();
+  const movieId = useMemo(() => Number(id), [id]);
+
   const [movie, setMovie] = useState(null);
   const [busy, setBusy] = useState(false);
   const [booked, setBooked] = useState(false);
@@ -22,10 +24,12 @@ export default function MovieDetail() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!movieId) return;
+
     (async () => {
       try {
         const res = await fetch(
-          `https://api.themoviedb.org/3/movie/${id}?language=ko-KR&api_key=${API_KEY}`
+          `https://api.themoviedb.org/3/movie/${movieId}?language=ko-KR&api_key=${API_KEY}`
         );
 
         if (!res.ok) throw new Error('영화 데이터를 불러오는 데 실패했습니다.');
@@ -35,20 +39,20 @@ export default function MovieDetail() {
         console.error(error);
       }
     })();
-  }, [id]);
+  }, [movieId]);
 
   //북마크 초기 상태
   useEffect(() => {
-    if (!user || !id) return;
+    if (!user || !movieId) return;
     (async () => {
       try {
-        const ok = await isBookmarked(user.id, Number(id));
+        const ok = await isBookmarked(user.id, movieId);
         setBooked(ok);
       } catch (e) {
         console.error(e);
       }
     })();
-  }, [user, id]);
+  }, [user, movieId]);
 
   const toggleBookmark = async () => {
     if (!user) {
@@ -56,12 +60,12 @@ export default function MovieDetail() {
       navigate('/login');
       return;
     }
-    if (!movie) return;
+    if (!movie || !movieId) return;
 
     try {
       setBusy(true);
       if (booked) {
-        await removeBookmark(user.id, Number(id));
+        await removeBookmark(user.id, movieId);
         setBooked(false);
       } else {
         await addBookmark(user.id, movie);
@@ -76,6 +80,8 @@ export default function MovieDetail() {
   };
 
   if (!movie) return <p className="text-center py-10">로딩 중...</p>;
+
+  const genres = movie.genres || [];
 
   return (
     <>
@@ -105,7 +111,7 @@ export default function MovieDetail() {
                   disabled={busy}
                   aria-label={booked ? '북마크 해제' : '북마크 추가'}
                   className="p-1 rounded-md hover:bg-gray-100 active:scale-95 transition"
-                  title={booked ? '북마크 해제' : '북마크 해제'}
+                  title={booked ? '북마크 해제' : '북마크 추가'}
                 >
                   {booked ? (
                     <HiBookmark className="w-6 h-6 text-red-500" />
@@ -117,7 +123,7 @@ export default function MovieDetail() {
             </div>
 
             <div className="flex flex-wrap gap-2 my-3">
-              {movie.genres.map((genre) => (
+              {genres.map((genre) => (
                 <span
                   key={genre.id}
                   className="bg-gray-200 text-gray-800 px-3 py-1 rounded-full text-sm"
@@ -133,7 +139,7 @@ export default function MovieDetail() {
           </div>
         </div>
       </section>
-      <CommentsSection movieId={Number(id)} movie={movie} />
+      <CommentsSection movieId={movieId} movie={movie} />
     </>
   );
 }

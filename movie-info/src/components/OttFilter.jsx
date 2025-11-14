@@ -1,21 +1,27 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { OTT_PROVIDERS } from '../utils/ottProviders';
 
 export default function OttFilter({ selectedOtts, onChange }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
 
-  const toggleProvider = (id) => {
-    if (selectedOtts.includes(id)) {
-      onChange(selectedOtts.filter((x) => x !== id));
-    } else {
-      onChange([...selectedOtts, id]);
-    }
-  };
+  const toggleProvider = useCallback(
+    (id) => {
+      if (selectedOtts.includes(id)) {
+        onChange(selectedOtts.filter((x) => x !== id));
+      } else {
+        onChange([...selectedOtts, id]);
+      }
+    },
+    [selectedOtts, onChange]
+  );
 
-  const handleRemoveChip = (id) => {
-    onChange(selectedOtts.filter((x) => x !== id));
-  };
+  const handleRemoveChip = useCallback(
+    (id) => {
+      onChange(selectedOtts.filter((x) => x !== id));
+    },
+    [selectedOtts, onChange]
+  );
 
   useEffect(() => {
     const handleClickOutside = (e) => {

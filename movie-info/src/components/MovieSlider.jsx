@@ -5,7 +5,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -36,13 +36,16 @@ export default function MovieSlider() {
     fetchNowPlaying();
   }, []);
 
+  const handleClick = useCallback(
+    (id) => {
+      navigate(`/details/${id}`);
+    },
+    [navigate]
+  );
+
   if (loading) {
     return <p className="loading">로딩 중...</p>;
   }
-
-  const handleClick = (id) => {
-    navigate(`/details/${id}`);
-  };
 
   return (
     <Swiper

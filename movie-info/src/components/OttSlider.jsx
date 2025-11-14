@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/navigation';
 
-import { getProviderIdsFromKeys } from '../utils/ottProviders';
-import { OTT_PROVIDERS } from '../utils/ottProviders';
+import { getProviderIdsFromKeys, OTT_PROVIDERS } from '../utils/ottProviders';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 
@@ -44,17 +43,20 @@ export default function OttSlider({ title, providerKeys }) {
         const filtered = data.results.filter((movie) => movie.adult === false);
         setMovies(filtered);
       } catch (error) {
-        console.error(`${title} 데이터를 불러오는 데 실패했습니다.`, error);
+        console.error('데이터를 불러오는 데 실패했습니다.', error);
       } finally {
         setLoading(false);
       }
     };
     fetchOttMovies();
-  }, [providerKeys, title]);
+  }, [providerKeys]);
 
-  const handleClick = (id) => {
-    navigate(`/details/${id}`);
-  };
+  const handleClick = useCallback(
+    (id) => {
+      navigate(`/details/${id}`);
+    },
+    [navigate]
+  );
 
   if (loading) {
     return <p className="loading">{title} 불러오는 중...</p>;
