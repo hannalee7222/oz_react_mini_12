@@ -5,6 +5,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './App.css';
 import MovieCard from './components/MovieCard';
 import MovieSlider from './components/MovieSlider';
+import UpcomingSlider from './components/UpcomingSlider';
+import OttSlider from './components/OttSlider';
+
 import { useNavigate } from 'react-router-dom';
 import { throttle } from 'lodash';
 
@@ -122,15 +125,34 @@ function App() {
 
   return (
     <div className="app">
-      <h1 className="text-xl md:text-2xl font-bold text-black dark:text-white">
-        🎬현재 상영작
+      <h1 className="text-xl md:text-2xl font-bold text-black dark:text-white mb-3">
+        🎬 현재 상영작
       </h1>
-
-      {/*슬라이더 -> page=1 기준으로 사용 */}
-      <div className="movie-slider-container">
-        <MovieSlider movies={movieList.slice(0, 10)} />
+      <div className="movie-slider-container mb-6">
+        <MovieSlider />
       </div>
 
+      {/*서브 슬라이더*/}
+      <section className="space-y-4 md:space-y-6">
+        {/*순서: 상영예정작-넷플릭스-디즈니+-웨이브-왓챠-애플tv */}
+        <UpcomingSlider />
+
+        <OttSlider title="넷플릭스 인기작" providerKeys={['netflix']} />
+        <OttSlider title="디즈니+ 인기작" providerKeys={['disney_plus']} />
+        <OttSlider title="웨이브 인기작" providerKeys={['wavve']} />
+        <OttSlider title="쿠팡플레이 인기작" providerKeys={['coupang_play']} />
+        <OttSlider title="티빙 인기작" providerKeys={['tving']} />
+        <OttSlider title="구글플레이 인기작" providerKeys={['google_play']} />
+        <OttSlider
+          title="아마존 프라임 비디오 인기작"
+          providerKeys={['amazon_prime']}
+        />
+      </section>
+
+      {/*인기 영화 무한그리드*/}
+      <h2 className="mt-10 mb-3 text-lg md:text-xl font-semibold text-black dark:text-white">
+        🍿 인기 영화 둘러보기
+      </h2>
       <div
         className="
        grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5
