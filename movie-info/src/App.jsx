@@ -115,10 +115,6 @@ function App() {
     [navigate]
   );
 
-  if (loading && page === 1) {
-    return <p className="loading">로딩 중...</p>;
-  }
-
   return (
     <div className="app">
       <h1 className="text-xl md:text-2xl font-bold text-black dark:text-white mb-3">
@@ -149,22 +145,27 @@ function App() {
       <h2 className="mt-10 mb-3 text-lg md:text-xl font-semibold text-black dark:text-white">
         🍿 인기 영화 둘러보기
       </h2>
-      <div
-        className="
+
+      {loading && page === 1 ? (
+        <p className="text-center text-gray-500 py-10">로딩 중...</p>
+      ) : (
+        <div
+          className="
        grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5
       "
-      >
-        {movieList.map((movie) => (
-          <MovieCard
-            key={movie.id}
-            id={movie.id}
-            poster_path={movie.poster_path}
-            title={movie.title}
-            vote_average={movie.vote_average}
-            onClick={handleClick}
-          />
-        ))}
-      </div>
+        >
+          {movieList.map((movie) => (
+            <MovieCard
+              key={movie.id}
+              id={movie.id}
+              poster_path={movie.poster_path}
+              title={movie.title}
+              vote_average={movie.vote_average}
+              onClick={handleClick}
+            />
+          ))}
+        </div>
+      )}
 
       {/*추가 로딩 상태 표시 */}
       {isFetching && (
