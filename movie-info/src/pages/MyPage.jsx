@@ -225,8 +225,6 @@ export default function MyPage() {
         </div>
 
         <div className="text-left">
-          <h2 className="text-2xl font-semibold mb-1">{user?.email}</h2>
-
           {isEditingNickname ? (
             <div className="flex items-center gap-2">
               <input
@@ -245,12 +243,19 @@ export default function MyPage() {
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <p className="text-lg">
+            <div className="flex items-center gap-3">
+              <p
+                className={
+                  nickname && nickname.trim().length > 0
+                    ? 'text-2xl font-semibold text-purple-500'
+                    : 'text-lg text-gray-400'
+                }
+              >
                 {nickname && nickname.trim().length > 0
                   ? nickname
                   : '닉네임을 설정해주세요'}
               </p>
+
               <button
                 onClick={() => setIsEditingNickname(true)}
                 className="text-sm text-red-500"
@@ -260,7 +265,7 @@ export default function MyPage() {
             </div>
           )}
 
-          <p className="text-sm text-gray-500 mt-1">{user?.email}</p>
+          <p className="text-sm text-gray-500 mt-4">{user?.email}</p>
         </div>
       </div>
 

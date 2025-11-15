@@ -26,7 +26,7 @@ function MovieCard({ poster_path, title, vote_average, id, onClick }) {
           이미지 없음
         </div>
       )}
-      <h3 className="text-base font-semibold mt-2 truncate overflow-hidden whitespace-nowrap">
+      <h3 className="text-sm font-semibold mt-2 leading-tight overflow-hidden break-keep max-h-[3rem]">
         {title}
       </h3>
       <p className="text-sm text-gray-500">⭐️평점: {vote_average ?? '-'}</p>

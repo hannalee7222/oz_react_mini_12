@@ -32,7 +32,7 @@ export default function SignupPage() {
     e.preventDefault();
     if (!validate()) return;
 
-    const res = await signUp({ email, password, userName: name });
+    const res = await signUp({ email, password });
 
     if (res.error) {
       setErrors((prev) => ({ ...prev, email: '이미 가입된 이메일입니다.' }));

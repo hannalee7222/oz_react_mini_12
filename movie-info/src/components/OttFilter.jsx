@@ -5,6 +5,18 @@ export default function OttFilter({ selectedOtts, onChange }) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
 
+  //바깥 클릭 시 드롭다운 닫혀지게끔
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const toggleProvider = useCallback(
     (id) => {
       if (selectedOtts.includes(id)) {
@@ -23,19 +35,8 @@ export default function OttFilter({ selectedOtts, onChange }) {
     [selectedOtts, onChange]
   );
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   return (
-    <div className="mb-4" ref={containerRef}>
+    <div className="mb-4">
       {/*선택된 ott칩 */}
       {selectedOtts.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-2">
@@ -58,7 +59,7 @@ export default function OttFilter({ selectedOtts, onChange }) {
       )}
 
       {/*드롭다운 버튼 */}
-      <div className="relative inline-block">
+      <div className="relative inline-block" ref={containerRef}>
         <button
           type="button"
           onClick={() => setOpen((prev) => !prev)}

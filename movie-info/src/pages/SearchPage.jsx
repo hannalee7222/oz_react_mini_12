@@ -14,17 +14,9 @@ export default function SearchPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('query') ?? '';
 
-  const initialOtts = (searchParams.get('ott') ?? '')
-    .split(',')
-    .filter(Boolean);
-
-  const [selectedOtts, setSelectedOtts] = useState(initialOtts);
-
-  useEffect(() => {
-    const ottFromUrl = (searchParams.get('ott') ?? '')
-      .split(',')
-      .filter(Boolean);
-    setSelectedOtts(ottFromUrl);
+  //URL에서 바로 selectedOtts 계산
+  const selectedOtts = useMemo(() => {
+    return (searchParams.get('ott') ?? '').split(',').filter(Boolean);
   }, [searchParams]);
 
   const [movies, setMovies] = useState([]);
@@ -190,10 +182,8 @@ export default function SearchPage() {
 
   //ott필터 변경 시 URL쿼리도 같이 업데이트
   const handleOttChange = (nextSelected) => {
-    setSelectedOtts(nextSelected);
-
     const params = new URLSearchParams(searchParams);
-    if (nextSelected.length) {
+    if (nextSelected.length > 0) {
       params.set('ott', nextSelected.join(','));
     } else {
       params.delete('ott');

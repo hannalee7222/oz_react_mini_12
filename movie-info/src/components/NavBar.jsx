@@ -116,11 +116,42 @@ export default function NavBar() {
   );
 
   //ott togle함수
-  const toggleOtt = useCallback((id) => {
-    setSelectedOtts((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  }, []);
+  const toggleOtt = useCallback(
+    (id) => {
+      setSelectedOtts((prev) => {
+        const isSelected = prev.includes(id);
+        const nextSelected = isSelected
+          ? prev.filter((x) => x !== id)
+          : [...prev, id];
+
+        const trimmed = keyword.trim();
+        const isInvalidKoreanChar = /^[ㄱ-ㅎ]$/.test(trimmed);
+
+        //검색결과가 있다면, OTT필터 변경 시 검색페이지로 이동과 갱신
+        if (trimmed !== '' && !isInvalidKoreanChar) {
+          const params = new URLSearchParams();
+          params.set('query', trimmed);
+
+          if (nextSelected.length > 0) {
+            params.set('ott', nextSelected.join(','));
+          }
+
+          const url = {
+            pathname: '/search',
+            search: params.toString(),
+          };
+
+          if (location.pathname === '/search') {
+            navigate(url, { replace: true });
+          } else {
+            navigate(url);
+          }
+        }
+        return nextSelected;
+      });
+    },
+    [keyword, navigate, location.pathname]
+  );
 
   return (
     <nav className="bg-[#111] text-white px-6 py-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -145,6 +176,12 @@ export default function NavBar() {
             value={keyword}
             onChange={(e) => setKeyword(e.target.value)}
             onFocus={() => setShowOttDropdown(true)} //input 클릭 시 열기
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                //enter누르면 드롭다운 닫히도록
+                setShowOttDropdown(false);
+              }
+            }}
           />
 
           {/*ott 체크박스 드롭다운 */}

@@ -9,6 +9,36 @@ import {
 } from '../supabase/comments';
 import { toast } from 'react-toastify';
 
+//이메일 마스킹 : @ 앞 4글자 ****처리
+function maskEmail(email) {
+  if (!email) return '';
+
+  const [local, domain] = email.split('@');
+  if (!domain) return email;
+
+  //길이에 따른 간단한 규칙적용
+  if (local.length <= 2) {
+    //또는 더 짧을 경우에는 전부 마스킹
+    return '***@' + domain;
+  }
+
+  const maskLength = Math.min(4, local.length); //최대 4글자 마스킹
+  const maskedLocal = '*'.repeat(maskLength) + local.slice(maskLength);
+
+  return `${maskedLocal}@${domain}`;
+}
+
+function getCommentDisplayName(comment) {
+  const profile = comment.profiles;
+  const nickname = profile?.nickname?.trim();
+  const email = profile?.email.trim();
+
+  if (nickname) return nickname; //우선순위 : 닉네임
+  if (email) return maskEmail(email); //그 다음 마스킹된 이메일
+
+  return '알 수 없는 사용자'; //둘 다 없을 때
+}
+
 export default function CommentsSection({ movieId, movie }) {
   const { userInfo: user } = useAuthContext();
   const navigate = useNavigate();
@@ -165,10 +195,16 @@ export default function CommentsSection({ movieId, movie }) {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="text-xl">{c.mood || '💬'}</span>
-                  <span className="text-xs text-gray-500">
-                    {new Date(c.created_at).toLocaleString()}
-                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-sm font-medium text-gray-900">
+                      {getCommentDisplayName(c)}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {new Date(c.created_at).toLocaleString()}
+                    </span>
+                  </div>
                 </div>
+
                 {user?.id === c.user_id && (
                   <button
                     onClick={() => onDelete(c.id)}

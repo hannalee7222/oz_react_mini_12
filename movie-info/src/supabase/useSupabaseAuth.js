@@ -5,13 +5,12 @@ import { useCallback } from 'react';
 export function useSupabaseAuth() {
   const { setUserInfo } = useAuthContext();
 
-  const signUp = async ({ email, password, userName }) => {
+  const signUp = async ({ email, password }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          userName,
           profileImageUrl: '',
         },
       },
@@ -104,8 +103,7 @@ export function useSupabaseAuth() {
     const userData = {
       id: authedUser.id,
       email: authedUser.email,
-      userName:
-        profileData?.nickname || authedUser.user_metadata?.userName || '',
+      userName: profileData?.nickname || authedUser.user_metadata?.email || '',
       profileImageUrl:
         profileData?.avatar_url ||
         authedUser.user_metadata?.profileImageUrl ||

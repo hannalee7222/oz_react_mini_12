@@ -7,7 +7,17 @@ export async function listCommentsByMovie(movieId) {
   const { data, error } = await supabase
     .from('comments')
     .select(
-      'id,user_id,movie_id,movie_title,poster_path,mood,content,created_at'
+      `id,
+      user_id,
+      movie_id,
+      movie_title,
+      poster_path,
+      mood,content,
+      created_at,
+      profiles (
+      nickname, email
+      )
+      `
     )
     .eq('movie_id', movieId)
     .order('created_at', { ascending: false });
@@ -43,7 +53,19 @@ export async function addComment({
         content: content?.trim() || null,
       },
     ])
-    .select()
+    .select(
+      `id,
+      user_id,
+      movie_id,
+      movie_title,
+      poster_path,
+      mood,content,
+      created_at,
+      profiles (
+      nickname, email
+      )
+      `
+    )
     .single();
 
   if (error) throw error;
