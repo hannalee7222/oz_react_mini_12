@@ -1,4 +1,4 @@
-## 🎬 OZ 무비 (React + TMDB + Supabase)
+## 🎬 OZ 무비 <span style="color: #a855f7;">.</span> (React + TMDB + Supabase)
 
 사용자가 원하는 영화를 검색하고, OTT별 필터링·북마크·댓글 기능을 통해
 자신만의 영화 정보를 관리할 수 있는 영화 정보 웹사이트입니다.
