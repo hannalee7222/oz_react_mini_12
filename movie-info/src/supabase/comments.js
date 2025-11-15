@@ -15,7 +15,7 @@ export async function listCommentsByMovie(movieId) {
       mood,content,
       created_at,
       profiles (
-      nickname, email
+      nickname, email, avatar_url
       )
       `
     )
@@ -62,7 +62,7 @@ export async function addComment({
       mood,content,
       created_at,
       profiles (
-      nickname, email
+      nickname, email, avatar_url
       )
       `
     )

@@ -9,6 +9,9 @@ import {
 } from '../supabase/comments';
 import { toast } from 'react-toastify';
 
+//기본이미지로 프로필 사진 없는 사용자는 기본 이미지로 대체할 거임.
+const DEFAULT_AVATAR = '/images/default_image.png';
+
 //이메일 마스킹 : @ 앞 4글자 ****처리
 function maskEmail(email) {
   if (!email) return '';
@@ -37,6 +40,16 @@ function getCommentDisplayName(comment) {
   if (email) return maskEmail(email); //그 다음 마스킹된 이메일
 
   return '알 수 없는 사용자'; //둘 다 없을 때
+}
+
+//프로필 이미지: 있으면 avatar_url, 없으면 기본이미지
+function getAvatarUrl(comment) {
+  const profile = comment.profiles;
+  const avatar = profile?.avatar_url;
+  if (avatar && typeof avatar === 'string' && avatar.trim().length > 0) {
+    return avatar;
+  }
+  return DEFAULT_AVATAR;
 }
 
 export default function CommentsSection({ movieId, movie }) {
@@ -192,34 +205,45 @@ export default function CommentsSection({ movieId, movie }) {
         <ul className="space-y-3">
           {list.map((c) => (
             <li key={c.id} className="border rounded-md p-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">{c.mood || '💬'}</span>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-gray-900">
-                      {getCommentDisplayName(c)}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {new Date(c.created_at).toLocaleString()}
-                    </span>
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex-shrink-0">
+                  <img
+                    src={getAvatarUrl(c)}
+                    alt="댓글 작성자 프로필"
+                    className="w-10 h-10 rounded-full object-cover bg-gray-200"
+                  />
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-sm font-medium text-gray-900">
+                        {getCommentDisplayName(c)}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(c.created_at).toLocaleString()}
+                      </span>
+                    </div>
+                    <span className="ml-3 text-xl">{c.mood || '💬'}</span>
                   </div>
+
+                  {c.content && (
+                    <p className="mt-2 text-sm text-gray-900 whitespace-pre-wrap break-words">
+                      {c.content}
+                    </p>
+                  )}
                 </div>
 
                 {user?.id === c.user_id && (
                   <button
                     onClick={() => onDelete(c.id)}
-                    className="text-xs text-red-500 hover:text-red-600"
+                    className="ml-2 text-xs text-red-500 hover:text-red-600 flex-shrink-0"
                     disabled={deletingId === c.id}
                   >
                     {deletingId === c.id ? '삭제 중...' : '삭제'}
                   </button>
                 )}
               </div>
-              {c.content && (
-                <p className="mt-2 text-sm text-gray-900 whitespace-pre-wrap break-words">
-                  {c.content}
-                </p>
-              )}
             </li>
           ))}
         </ul>

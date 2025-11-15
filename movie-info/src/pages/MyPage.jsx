@@ -11,6 +11,8 @@ import {
 import { listMyComments, deleteMyComment } from '../supabase/comments';
 import { toast } from 'react-toastify';
 
+const DEFAULT_AVATAR = '/images/default_image.png';
+
 export default function MyPage() {
   const { userInfo: user, updateUserName } = useAuthContext();
   const [nickname, setNickname] = useState('');
@@ -40,6 +42,7 @@ export default function MyPage() {
 
       if (data) {
         setNickname(data.nickname || '');
+        //DB에는 avatar_url이 없으면 null, 상태에는 ''로 두고 UI에서 기본이미지로 대체하기
         setProfileImgUrl(data.avatar_url || '');
       } else {
         //프로필 row가 없으면 기본값으로 빈 row(화면만 빈 값)
@@ -65,6 +68,7 @@ export default function MyPage() {
       id: user.id, //PK
       email: user.email,
       nickname: nickname,
+      //DB에는 기본이미지 안 넣을 거고, 실제 업로드한 URL만 저장할 거임.
       avatar_url: profileImgUrl || null,
     });
 
@@ -190,20 +194,19 @@ export default function MyPage() {
   //상세 페이지 이동
   const goDetail = (movieId) => navigate(`/details/${movieId}`);
 
+  //화면에서 사용할 프로필 이미지(실제 URL 또는 기본이미지)
+  const effectiveProfileImg = profileImgUrl || DEFAULT_AVATAR;
+
   return (
     <div className="flex flex-col items-center py-12 text-center">
       <div className="flex flex-col sm:flex-row items-center gap-6 mb-10">
         <div className="flex flex-col items-center">
           <div className="w-40 h-40 rounded-full border-2 border-gray-300 overflow-hidden flex items-center justify-center bg-gray-100">
-            {profileImgUrl ? (
-              <img
-                src={profileImgUrl}
-                alt="profile"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-sm text-gray-500">이미지 없음</span>
-            )}
+            <img
+              src={effectiveProfileImg}
+              alt="profile"
+              className="w-full h-full object-cover"
+            />
           </div>
 
           <label
