@@ -235,7 +235,7 @@ export default function MyPage() {
                 value={nickname}
                 onChange={handleNicknameChange}
                 maxLength={12}
-                className="border rounded px-2 py-1 text-sm"
+                className="border rounded px-2 py-1 text-sm text-gray-800"
                 placeholder="닉네임 입력"
               />
               <button
